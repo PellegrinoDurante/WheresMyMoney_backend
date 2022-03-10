@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Charge;
 use App\Services\ChargeDataProvider\ChargeDataProviderFactory;
 use App\Models\RecurringExpense;
 use App\Services\Trigger\TriggerFactory;
@@ -49,6 +50,13 @@ class SuggestCharge implements ShouldQueue
         $provider = $this->chargeDataProviderFactory->create((object)$providerConfig);
         $chargeData = $provider->getData($triggerResult->context);
 
-        // TODO: Suggest new charge with data
+        // Add a new draft charge
+        Charge::create([
+            "amount" => $chargeData->amount,
+            "charged_at" => $chargeData->chargedAt,
+            "draft" => true,
+        ]);
+
+        // TODO: send a notification for the new draft charge
     }
 }
