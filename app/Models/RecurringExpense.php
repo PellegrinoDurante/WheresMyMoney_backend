@@ -19,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string|null $description
  * @property array $trigger
- * @property mixed $chargeDataProvider
+ * @property mixed $charge_data_provider
  * @property-read Collection|Charge[] $charges
  * @property-read int|null $charges_count
  * @method static Builder|RecurringExpense newModelQuery()
