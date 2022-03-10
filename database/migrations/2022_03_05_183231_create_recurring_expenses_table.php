@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->json('trigger');
-            $table->json('chargeDataProvider');
+            $table->json('charge_data_provider');
         });
     }
 

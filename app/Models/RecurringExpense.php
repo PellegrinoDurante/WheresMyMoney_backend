@@ -25,24 +25,29 @@ use Illuminate\Support\Carbon;
  * @method static Builder|RecurringExpense newModelQuery()
  * @method static Builder|RecurringExpense newQuery()
  * @method static Builder|RecurringExpense query()
- * @method static Builder|RecurringExpense whereChargeDataProvider($value)
- * @method static Builder|RecurringExpense whereCreatedAt($value)
- * @method static Builder|RecurringExpense whereDescription($value)
  * @method static Builder|RecurringExpense whereId($value)
- * @method static Builder|RecurringExpense whereName($value)
- * @method static Builder|RecurringExpense whereTrigger($value)
+ * @method static Builder|RecurringExpense whereCreatedAt($value)
  * @method static Builder|RecurringExpense whereUpdatedAt($value)
+ * @method static Builder|RecurringExpense whereName($value)
+ * @method static Builder|RecurringExpense whereDescription($value)
+ * @method static Builder|RecurringExpense whereTrigger($value)
+ * @method static Builder|RecurringExpense whereChargeDataProvider($value)
  * @mixin Eloquent
  */
 class RecurringExpense extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'trigger', 'charge_data_provider'];
+    protected $fillable = [
+        "name",
+        "description",
+        "trigger",
+        "charge_data_provider",
+    ];
 
     protected $casts = [
-        'trigger' => 'array',
-        'charge_data_provider' => 'array',
+        "trigger" => "array",
+        "charge_data_provider" => "array",
     ];
 
     public function charges(): HasMany

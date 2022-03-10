@@ -14,11 +14,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('charges', function (Blueprint $table) {
+        Schema::create("charges", function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->foreignIdFor(RecurringExpense::class);
-            $table->float('amount', unsigned: true);
+            $table->float("amount", unsigned: true);
+            $table->dateTime("charged_at");
+            $table->boolean("draft");
+            // TODO: add date for draft?
         });
     }
 
