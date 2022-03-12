@@ -6,7 +6,7 @@ class EmailLinkScrapingChargeDataProvider implements ChargeDataProvider
 {
     const TYPE = "email_link_scraping";
 
-    function getData(object $context): object
+    function getData(object $context): ChargeData
     {
         // TODO: Implement getData() method.
     }

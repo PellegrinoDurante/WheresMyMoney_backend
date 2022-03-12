@@ -52,7 +52,7 @@ class SuggestCharge implements ShouldQueue
 
         // Add a new draft charge
         Charge::create([
-            "amount" => $chargeData->amount,
+            "amount" => intval($chargeData->amount * 100),
             "charged_at" => $chargeData->chargedAt,
             "draft" => true,
         ]);

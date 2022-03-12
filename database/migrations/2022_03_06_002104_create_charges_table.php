@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->foreignIdFor(RecurringExpense::class);
-            $table->float("amount", unsigned: true);
+            $table->integer("amount", unsigned: true);
             $table->dateTime("charged_at");
             $table->boolean("draft");
             // TODO: add date for draft?

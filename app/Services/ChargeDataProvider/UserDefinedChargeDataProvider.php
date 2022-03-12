@@ -3,6 +3,7 @@
 namespace App\Services\ChargeDataProvider;
 
 use Illuminate\Support\Carbon;
+use JetBrains\PhpStorm\Pure;
 
 class UserDefinedChargeDataProvider implements ChargeDataProvider
 {
@@ -12,12 +13,10 @@ class UserDefinedChargeDataProvider implements ChargeDataProvider
     {
     }
 
-    function getData(object $context): object
+    #[Pure]
+    function getData(object $context): ChargeData
     {
-        // TODO: maybe create a new model class for this structure?
-        return (object)[
-            "amount" => $this->amount,
-            "chargedAt" => $this->chargedAt,
-        ];
+        // Returns the user-defined charge data (fixed value for every charge)
+        return new ChargeData($this->amount, $this->chargedAt);
     }
 }
