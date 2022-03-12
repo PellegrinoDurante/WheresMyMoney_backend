@@ -16,18 +16,17 @@ class TriggerFactory
     public function create(object $config): Trigger
     {
         return match ($config->type) {
-            TemporalTrigger::TYPE => $this->buildTemporalTrigger($config),
+            TemporalTrigger::TYPE => $this->buildTemporalTrigger(),
             EmailTrigger::TYPE => $this->buildEmailTrigger($config),
             default => throw new UnsupportedTriggerTypeException($config->type),
         };
     }
 
     /**
-     * @param object $config
      * @return TemporalTrigger
      */
     #[Pure]
-    private function buildTemporalTrigger(object $config): TemporalTrigger
+    private function buildTemporalTrigger(): TemporalTrigger
     {
         return new TemporalTrigger();
     }
