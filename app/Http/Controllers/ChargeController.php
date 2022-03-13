@@ -17,7 +17,7 @@ class ChargeController extends Controller
      */
     public function index(RecurringExpense $recurringExpense): JsonResponse
     {
-        return response()->json($recurringExpense->charges());
+        return response()->json($recurringExpense->charges()->get());
     }
 
     /**

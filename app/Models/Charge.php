@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
  * @property int $recurring_expense_id
  * @property float $amount
  * @property string $charged_at
- * @property int $draft
+ * @property boolean $draft
  * @method static Builder|Charge newModelQuery()
  * @method static Builder|Charge newQuery()
  * @method static Builder|Charge query()
@@ -38,5 +38,9 @@ class Charge extends Model
         "amount",
         "charged_at",
         "draft"
+    ];
+
+    protected $casts = [
+        "draft" => "bool"
     ];
 }
