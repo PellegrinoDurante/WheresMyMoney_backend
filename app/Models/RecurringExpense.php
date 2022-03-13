@@ -18,8 +18,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property string $name
  * @property string|null $description
- * @property array $trigger
- * @property mixed $charge_data_provider
+ * @property object $trigger
+ * @property object $charge_data_provider
  * @property-read Collection|Charge[] $charges
  * @property-read int|null $charges_count
  * @method static Builder|RecurringExpense newModelQuery()
@@ -46,8 +46,8 @@ class RecurringExpense extends Model
     ];
 
     protected $casts = [
-        "trigger" => "array",
-        "charge_data_provider" => "array",
+        "trigger" => "object",
+        "charge_data_provider" => "object",
     ];
 
     public function charges(): HasMany

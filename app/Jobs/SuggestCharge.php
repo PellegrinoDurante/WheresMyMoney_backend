@@ -2,9 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\Charge;
-use App\Services\ChargeDataProvider\ChargeDataProviderFactory;
 use App\Models\RecurringExpense;
+use App\Services\ChargeDataProvider\ChargeDataProviderFactory;
 use App\Services\Trigger\TriggerFactory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,7 +20,7 @@ class SuggestCharge implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(private TriggerFactory $triggerFactory, private ChargeDataProviderFactory $chargeDataProviderFactory)
+    public function __construct(private RecurringExpense $recurringExpense)
     {
         //
     }
@@ -31,13 +30,13 @@ class SuggestCharge implements ShouldQueue
      *
      * @return void
      */
-    public function handle(RecurringExpense $recurringExpense)
+    public function handle(TriggerFactory $triggerFactory, ChargeDataProviderFactory $chargeDataProviderFactory)
     {
         // TODO: handle exceptions
 
         // Check if trigger is triggered
-        $triggerConfig = $recurringExpense->trigger; // TODO: change trigger from array to object
-        $trigger = $this->triggerFactory->create((object)$triggerConfig);
+        $triggerConfig = $this->recurringExpense->trigger;
+        $trigger = $triggerFactory->create($triggerConfig);
         $triggerResult = $trigger->check();
 
         // Return if it is not triggered
@@ -46,12 +45,12 @@ class SuggestCharge implements ShouldQueue
         }
 
         // Otherwise, continue getting the charge data with the provider
-        $providerConfig = $recurringExpense->charge_data_provider; // TODO: change charge_data_provider from array to object
-        $provider = $this->chargeDataProviderFactory->create((object)$providerConfig);
+        $providerConfig = $this->recurringExpense->charge_data_provider;
+        $provider = $chargeDataProviderFactory->create($providerConfig);
         $chargeData = $provider->getData($triggerResult->context);
 
         // Add a new draft charge
-        Charge::create([
+        $this->recurringExpense->charges()->create([
             "amount" => intval($chargeData->amount * 100),
             "charged_at" => $chargeData->chargedAt,
             "draft" => true,

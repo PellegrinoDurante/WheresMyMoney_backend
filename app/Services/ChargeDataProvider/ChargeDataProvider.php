@@ -4,5 +4,5 @@ namespace App\Services\ChargeDataProvider;
 
 interface ChargeDataProvider
 {
-    function getData(object $context): ChargeData;
+    function getData(?object $context = null): ChargeData;
 }

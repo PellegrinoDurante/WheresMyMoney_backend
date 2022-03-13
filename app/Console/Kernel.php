@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Jobs\SuggestCharge;
+use App\Models\RecurringExpense;
 use App\Services\TriggerService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -25,8 +27,10 @@ class Kernel extends ConsoleKernel
         $recurringExpenses = $triggerService->getExpenseWithSchedulingTriggers();
 
         // Register a command for each recurring expense with a scheduling trigger
-        $recurringExpenses->each(function ($recurringExpense) use ($schedule) {
-            // TODO: schedule a job for triggers check
+        $recurringExpenses->each(function (RecurringExpense $recurringExpense) use ($schedule) {
+            $schedule
+                ->job(new SuggestCharge($recurringExpense))
+                ->cron($recurringExpense->trigger->cron);
         });
     }
 

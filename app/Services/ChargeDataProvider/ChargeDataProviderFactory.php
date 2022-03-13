@@ -2,6 +2,7 @@
 
 namespace App\Services\ChargeDataProvider;
 
+use Carbon\Carbon;
 use JetBrains\PhpStorm\Pure;
 
 class ChargeDataProviderFactory
@@ -27,10 +28,10 @@ class ChargeDataProviderFactory
      * @param object $config
      * @return UserDefinedChargeDataProvider
      */
-    #[Pure]
     private function buildUserDefinedChargeDataProvider(object $config): UserDefinedChargeDataProvider
     {
-        return new UserDefinedChargeDataProvider($config->amount, $config->chargedAt);
+        $chargedAt = !empty($config->chargedAt) ? new Carbon($config->chargedAt) : null;
+        return new UserDefinedChargeDataProvider($config->amount, $chargedAt);
     }
 
     /**

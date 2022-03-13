@@ -2,21 +2,20 @@
 
 namespace App\Services\ChargeDataProvider;
 
-use Illuminate\Support\Carbon;
-use JetBrains\PhpStorm\Pure;
+use Carbon\Carbon;
 
 class UserDefinedChargeDataProvider implements ChargeDataProvider
 {
     const TYPE = "user_defined";
 
-    public function __construct(private float $amount, private Carbon $chargedAt)
+    public function __construct(private float $amount, private ?Carbon $chargedAt = null)
     {
     }
 
-    #[Pure]
-    function getData(object $context): ChargeData
+    function getData(?object $context = null): ChargeData
     {
         // Returns the user-defined charge data (fixed value for every charge)
-        return new ChargeData($this->amount, $this->chargedAt);
+        $chargedAt = $this->chargedAt ?? now();
+        return new ChargeData($this->amount, $chargedAt);
     }
 }
