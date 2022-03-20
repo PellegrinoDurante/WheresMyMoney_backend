@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 /**
  * App\Models\RecurringExpense
  *
+ * @mixin Eloquent
  * @property int $id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property object $charge_data_provider
  * @property-read Collection|Charge[] $charges
  * @property-read int|null $charges_count
+ * @property string $last_trigger_ref
  * @method static Builder|RecurringExpense newModelQuery()
  * @method static Builder|RecurringExpense newQuery()
  * @method static Builder|RecurringExpense query()
@@ -32,7 +34,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|RecurringExpense whereDescription($value)
  * @method static Builder|RecurringExpense whereTrigger($value)
  * @method static Builder|RecurringExpense whereChargeDataProvider($value)
- * @mixin Eloquent
+ * @method static Builder|RecurringExpense whereLastTriggerRef($value)
  */
 class RecurringExpense extends Model
 {
@@ -43,6 +45,7 @@ class RecurringExpense extends Model
         "description",
         "trigger",
         "charge_data_provider",
+        "last_trigger_ref",
     ];
 
     protected $casts = [

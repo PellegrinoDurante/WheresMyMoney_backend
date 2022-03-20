@@ -39,8 +39,8 @@ class SuggestCharge implements ShouldQueue
         $trigger = $triggerFactory->create($triggerConfig);
         $triggerResult = $trigger->check();
 
-        // Return if it is not triggered
-        if (!$triggerResult->triggered) {
+        // Return if it is not triggered or current trigger ref is the same as the last one executed
+        if (!$triggerResult->triggered || $triggerResult?->triggerRef == $this->recurringExpense->last_trigger_ref) {
             return;
         }
 
@@ -55,6 +55,10 @@ class SuggestCharge implements ShouldQueue
             "charged_at" => $chargeData->chargedAt,
             "draft" => true,
         ]);
+
+        // Save ref of this trigger to avoid duplicates
+        $this->recurringExpense->last_trigger_ref = $triggerResult?->triggerRef;
+        $this->recurringExpense->save();
 
         // TODO: send a notification for the new draft charge
     }

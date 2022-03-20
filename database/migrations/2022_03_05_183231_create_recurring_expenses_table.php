@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->json('trigger');
             $table->json('charge_data_provider');
+            $table->string('last_trigger_ref')->nullable();
         });
     }
 
