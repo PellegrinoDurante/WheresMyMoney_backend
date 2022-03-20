@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -33,6 +34,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read Collection|PersonalAccessToken[] $tokens
  * @property-read int|null $tokens_count
  * @property-read AccessToken|null $accessToken
+ * @property-read Collection|RecurringExpense[] $recurringExpenses
+ * @property-read int|null $recurring_expenses_count
  * @method static UserFactory factory(...$parameters)
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
@@ -83,5 +86,10 @@ class User extends Authenticatable
     public function accessToken(): HasOne
     {
         return $this->hasOne(AccessToken::class);
+    }
+
+    public function recurringExpenses(): HasMany
+    {
+        return $this->hasMany(RecurringExpense::class);
     }
 }

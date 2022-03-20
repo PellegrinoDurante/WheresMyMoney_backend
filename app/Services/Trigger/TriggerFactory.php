@@ -13,11 +13,11 @@ class TriggerFactory
      * @return Trigger
      * @throws UnsupportedTriggerTypeException
      */
-    public function create(object $config): Trigger
+    public function create(object $config, ?int $userId = null): Trigger
     {
         return match ($config->type) {
             TemporalTrigger::TYPE => $this->buildTemporalTrigger(),
-            EmailTrigger::TYPE => $this->buildEmailTrigger($config),
+            EmailTrigger::TYPE => $this->buildEmailTrigger($userId, $config),
             default => throw new UnsupportedTriggerTypeException($config->type),
         };
     }
@@ -33,10 +33,11 @@ class TriggerFactory
 
     /**
      * @param object $config
+     * @param int|null $userId
      * @return EmailTrigger
      */
-    private function buildEmailTrigger(object $config): EmailTrigger
+    private function buildEmailTrigger(?int $userId, object $config): EmailTrigger
     {
-        return new EmailTrigger($config->subject);
+        return new EmailTrigger($userId, $config->subject);
     }
 }

@@ -20,7 +20,7 @@ class GoogleAuthenticationService
      */
     public function getClient(int $userId, array|string $scopes = []): Client
     {
-        $client = $this->createGoogleClient($scopes);
+        $client = $this->createGoogleClient($userId, $scopes);
 
         $storedAccessToken = User::find($userId)->accessToken;
 
@@ -38,13 +38,14 @@ class GoogleAuthenticationService
 
     /**
      * @param string $authorizationCode
+     * @param int $userId
      * @param array|string $scopes
      * @return array
      * @throws Exception
      */
-    public function getAccessTokenFromAuthCode(string $authorizationCode, array|string $scopes = []): array
+    public function getAccessTokenFromAuthCode(string $authorizationCode, int $userId, array|string $scopes = []): array
     {
-        $client = $this->createGoogleClient($scopes);
+        $client = $this->createGoogleClient($userId, $scopes);
         return $client->fetchAccessTokenWithAuthCode($authorizationCode);
     }
 
@@ -59,11 +60,12 @@ class GoogleAuthenticationService
     }
 
     /**
+     * @param int $userId
      * @param array|string $scopes
      * @return Client
      * @throws Exception
      */
-    private function createGoogleClient(array|string $scopes = []): Client
+    private function createGoogleClient(int $userId, array|string $scopes = []): Client
     {
         // Create the Google client
         $client = new Client();
@@ -75,12 +77,12 @@ class GoogleAuthenticationService
         $redirectUri = route("auth.google.redirect", absolute: false);
         $client->setRedirectUri("http://localhost" . $redirectUri);
 
-        $client->setTokenCallback(function ($cacheKey, $accessToken) {
+        $client->setTokenCallback(function ($cacheKey, $accessToken) use ($userId) {
             $this->storeAccessToken([
                 "access_token" => $accessToken,
                 "expires_in" => 3600,
                 "created" => time(),
-            ], 1);
+            ], $userId);
         });
 
         return $client;

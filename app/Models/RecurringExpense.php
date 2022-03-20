@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property int $user_id
  * @property string $name
  * @property string|null $description
  * @property object $trigger
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|RecurringExpense whereId($value)
  * @method static Builder|RecurringExpense whereCreatedAt($value)
  * @method static Builder|RecurringExpense whereUpdatedAt($value)
+ * @method static Builder|RecurringExpense whereUserId($value)
  * @method static Builder|RecurringExpense whereName($value)
  * @method static Builder|RecurringExpense whereDescription($value)
  * @method static Builder|RecurringExpense whereTrigger($value)

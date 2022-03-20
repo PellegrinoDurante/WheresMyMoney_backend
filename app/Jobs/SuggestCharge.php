@@ -67,7 +67,7 @@ class SuggestCharge implements ShouldQueue
     private function getTriggerResult(TriggerFactory $triggerFactory): TriggerResult
     {
         $triggerConfig = $this->recurringExpense->trigger;
-        $trigger = $triggerFactory->create($triggerConfig);
+        $trigger = $triggerFactory->create($triggerConfig, $this->recurringExpense->user_id);
         return $trigger->check();
     }
 
@@ -77,7 +77,15 @@ class SuggestCharge implements ShouldQueue
      */
     private function canCreateDraftCharge(TriggerResult $triggerResult): bool
     {
-        return $triggerResult->triggered || $triggerResult?->triggerRef == $this->recurringExpense->last_trigger_ref;
+        if (!$triggerResult->triggered) {
+            return false;
+        }
+
+        if ($triggerResult?->triggerRef != null && $triggerResult?->triggerRef == $this->recurringExpense->last_trigger_ref) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -24,7 +24,7 @@ class GoogleAuthenticationController extends Controller
     public function loginPage(): RedirectResponse
     {
         $scopes = [Gmail::MAIL_GOOGLE_COM]; // TODO: abstract this
-        $client = $this->googleAuthenticationService->getClient(1, $scopes);
+        $client = $this->googleAuthenticationService->getClient(1, $scopes); // TODO: get authenticated user's ID
         $googleAuthUrl = $client->createAuthUrl();
 
         return redirect()->away($googleAuthUrl);
@@ -40,8 +40,8 @@ class GoogleAuthenticationController extends Controller
         $authorizationCode = $request->query->get("code");
         $scopes = [Gmail::MAIL_GOOGLE_COM]; // TODO: abstract this
 
-        $accessToken = $this->googleAuthenticationService->getAccessTokenFromAuthCode($authorizationCode, $scopes);
-        $this->googleAuthenticationService->storeAccessToken($accessToken, 1);
+        $accessToken = $this->googleAuthenticationService->getAccessTokenFromAuthCode($authorizationCode, 1, $scopes); // TODO: get authenticated user's ID
+        $this->googleAuthenticationService->storeAccessToken($accessToken, 1); // TODO: get authenticated user's ID
 
         return response("Access token stored"); // TODO: return a redirect?
     }

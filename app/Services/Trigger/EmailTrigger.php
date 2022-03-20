@@ -14,7 +14,7 @@ class EmailTrigger implements Trigger
 
     private GoogleAuthenticationService $googleAuthenticationService;
 
-    public function __construct(private string $subject)
+    public function __construct(private int $userId, private string $subject)
     {
         $this->googleAuthenticationService = App::make(GoogleAuthenticationService::class);
     }
@@ -22,7 +22,7 @@ class EmailTrigger implements Trigger
     public function check(): TriggerResult
     {
         try {
-            $client = $this->googleAuthenticationService->getClient(1, Gmail::MAIL_GOOGLE_COM); // TODO: userId
+            $client = $this->googleAuthenticationService->getClient($this->userId, Gmail::MAIL_GOOGLE_COM); // TODO: userId
             $gmailService = new Gmail($client);
 
             $emails = $gmailService->users_messages->listUsersMessages('me', [
