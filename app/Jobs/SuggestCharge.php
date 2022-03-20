@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\RecurringExpense;
 use App\Services\ChargeDataProvider\ChargeData;
 use App\Services\ChargeDataProvider\ChargeDataProviderFactory;
+use App\Services\ChargeDataProvider\UnableToGetChargeDataException;
 use App\Services\ChargeDataProvider\UnsupportedChargeDataProviderTypeException;
 use App\Services\Trigger\TriggerFactory;
 use App\Services\Trigger\TriggerResult;
@@ -105,6 +106,7 @@ class SuggestCharge implements ShouldQueue
      * @param TriggerResult $triggerResult
      * @return ChargeData
      * @throws UnsupportedChargeDataProviderTypeException
+     * @throws UnableToGetChargeDataException
      */
     protected function getChargeData(ChargeDataProviderFactory $chargeDataProviderFactory, TriggerResult $triggerResult): ChargeData
     {

@@ -3,6 +3,7 @@
 namespace App\Services\Trigger;
 
 use App\Services\GoogleAuthenticationService;
+use Base64Url\Base64Url;
 use Google\Exception;
 use Google\Service\Gmail;
 use Illuminate\Support\Facades\App;
@@ -30,10 +31,29 @@ class EmailTrigger implements Trigger
                 "maxResults" => 1
             ]);
 
-            $lastEmail = $emails->getMessages()[0];
-            $lastEmailId = $lastEmail->getId();
+            // Get last email's ID
+            $lastEmailId = $emails->getMessages()[0]->getId();
 
-            return new TriggerResult($lastEmailId, triggerRef: $lastEmailId, context: $lastEmail);
+            // Get last email content and attachments
+            $lastEmail = $gmailService->users_messages->get('me', $lastEmailId);
+            $lastEmailParts = collect($lastEmail->getPayload()->getParts());
+            $pdfAttachmentParts = $lastEmailParts->filter(fn(Gmail\MessagePart $part) => $part->getMimeType() == 'application/pdf');
+
+            $pdfAttachments = collect();
+            $pdfAttachmentParts->each(function (Gmail\MessagePart $part) use ($lastEmailId, $gmailService, $pdfAttachments) {
+                $pdfAttachmentId = $part->getBody()->attachmentId;
+                $pdfAttachment = $gmailService->users_messages_attachments->get('me', $lastEmailId, $pdfAttachmentId)->data;
+                $pdfAttachments->push((object)[
+                    'name' => $part->filename,
+                    'data' => Base64Url::decode($pdfAttachment),
+                ]);
+            });
+
+            $context = (object)[
+                'attachments' => $pdfAttachments,
+            ];
+
+            return new TriggerResult($lastEmailId, triggerRef: $lastEmailId, context: $context);
 
         } catch (Exception $e) {
             Log::error(__CLASS__ . '::' . __METHOD__ . ' - ' . $e->getMessage());

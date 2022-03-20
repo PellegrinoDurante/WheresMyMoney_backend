@@ -41,7 +41,19 @@ class ChargeDataProviderFactory
     #[Pure]
     private function buildEmailAttachmentPdfChargeDataProvider(object $config): EmailAttachmentPdfChargeDataProvider
     {
-        return new EmailAttachmentPdfChargeDataProvider();
+        return new EmailAttachmentPdfChargeDataProvider(
+            $config->index,
+            $config->page,
+            $config->amountPosX,
+            $config->amountPosY,
+            $config->amountWidth,
+            $config->amountHeight,
+            $config->chargedAtPosX,
+            $config->chargedAtPosY,
+            $config->chargedAtWidth,
+            $config->chargedAtHeight,
+            $config->dateFormat,
+        );
     }
 
     /**
