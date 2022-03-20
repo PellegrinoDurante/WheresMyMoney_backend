@@ -35,9 +35,8 @@ class TriggerFactory
      * @param object $config
      * @return EmailTrigger
      */
-    #[Pure]
     private function buildEmailTrigger(object $config): EmailTrigger
     {
-        return new EmailTrigger();
+        return new EmailTrigger($config->subject);
     }
 }
