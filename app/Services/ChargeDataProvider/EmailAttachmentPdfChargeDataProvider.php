@@ -2,6 +2,8 @@
 
 namespace App\Services\ChargeDataProvider;
 
+use App\Facades\AmountParserFacade;
+use App\Facades\ChargedAtParserFacade;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
@@ -11,17 +13,18 @@ class EmailAttachmentPdfChargeDataProvider implements ChargeDataProvider
     const TYPE = "email_attachment_pdf";
 
     public function __construct(
-        private int $index,
-        private int $page,
-        private int $amountPosX,
-        private int $amountPosY,
-        private int $amountWidth,
-        private int $amountHeight,
-        private int $chargedAtPosX,
-        private int $chargedAtPosY,
-        private int $chargedAtWidth,
-        private int $chargedAtHeight,
-        private string $dateFormat,
+        private int     $index,
+        private int     $page,
+        private int     $amountPosX,
+        private int     $amountPosY,
+        private int     $amountWidth,
+        private int     $amountHeight,
+        private int     $chargedAtPosX,
+        private int     $chargedAtPosY,
+        private int     $chargedAtWidth,
+        private int     $chargedAtHeight,
+        private string  $dateFormat,
+        private ?string $dateLocale = null,
     )
     {
     }
@@ -75,7 +78,7 @@ class EmailAttachmentPdfChargeDataProvider implements ChargeDataProvider
     protected function readAmount(array $pdfContent): float
     {
         $amount = $this->findElementsInBox($pdfContent, $this->amountPosX, $this->amountPosY, $this->amountWidth, $this->amountHeight);
-        return $this->parseAmount($amount);
+        return AmountParserFacade::parse($amount);
     }
 
     /**
@@ -86,17 +89,7 @@ class EmailAttachmentPdfChargeDataProvider implements ChargeDataProvider
     protected function readChargedAt(array $pdfContent): Carbon
     {
         $chargedAt = $this->findElementsInBox($pdfContent, $this->chargedAtPosX, $this->chargedAtPosY, $this->chargedAtWidth, $this->chargedAtHeight);
-        return $this->parseChargedAt($chargedAt);
-    }
-
-    private function parseAmount($data): float
-    {
-        return floatval(str_replace(',', '.', $data));
-    }
-
-    private function parseChargedAt(string $chargedAt): Carbon
-    {
-        return Carbon::createFromFormat($this->dateFormat, $chargedAt);
+        return ChargedAtParserFacade::parse($chargedAt, $this->dateFormat, $this->dateLocale);
     }
 
     /**

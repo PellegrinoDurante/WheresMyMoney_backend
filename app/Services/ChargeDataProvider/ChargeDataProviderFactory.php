@@ -18,6 +18,7 @@ class ChargeDataProviderFactory
     {
         return match ($config->type) {
             UserDefinedChargeDataProvider::TYPE => $this->buildUserDefinedChargeDataProvider($config),
+            EmailBodyScrapingChargeDataProvider::TYPE => $this->buildEmailBodyScrapingChargeDataProvider($config),
             EmailAttachmentPdfChargeDataProvider::TYPE => $this->buildEmailAttachmentPdfChargeDataProvider($config),
             EmailLinkScrapingChargeDataProvider::TYPE => $this->buildEmailLinkScrapingChargeDataProvider($config),
             default => throw new UnsupportedChargeDataProviderTypeException($config->type),
@@ -32,6 +33,16 @@ class ChargeDataProviderFactory
     {
         $chargedAt = !empty($config->chargedAt) ? new Carbon($config->chargedAt) : null;
         return new UserDefinedChargeDataProvider($config->amount, $chargedAt);
+    }
+
+    /**
+     * @param object $config
+     * @return EmailBodyScrapingChargeDataProvider
+     */
+    #[Pure]
+    private function buildEmailBodyScrapingChargeDataProvider(object $config): EmailBodyScrapingChargeDataProvider
+    {
+        return new EmailBodyScrapingChargeDataProvider($config->amountXPath, $config->chargedAtXPath, $config->chargedAtFormat, $config->dateLocale);
     }
 
     /**
@@ -53,6 +64,7 @@ class ChargeDataProviderFactory
             $config->chargedAtWidth,
             $config->chargedAtHeight,
             $config->dateFormat,
+            $config->dateLocale ?? null,
         );
     }
 

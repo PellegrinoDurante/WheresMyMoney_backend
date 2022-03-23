@@ -37,6 +37,15 @@ class EmailTrigger implements Trigger
             // Get last email content and attachments
             $lastEmail = $gmailService->users_messages->get('me', $lastEmailId);
             $lastEmailParts = collect($lastEmail->getPayload()->getParts());
+
+            if ($lastEmailParts->isEmpty()) {
+                // Get email's body
+                $emailBody = Base64Url::decode($lastEmail->getPayload()->getBody()->data);
+            } else {
+                // TODO: get email's body when Google Message body is a container MIME message parts.
+            }
+
+            // Get email's attachments
             $pdfAttachmentParts = $lastEmailParts->filter(fn(Gmail\MessagePart $part) => $part->getMimeType() == 'application/pdf');
 
             $pdfAttachments = collect();
@@ -50,6 +59,7 @@ class EmailTrigger implements Trigger
             });
 
             $context = (object)[
+                'body' => $emailBody ?? null,
                 'attachments' => $pdfAttachments,
             ];
 
