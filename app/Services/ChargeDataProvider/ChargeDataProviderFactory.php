@@ -75,6 +75,13 @@ class ChargeDataProviderFactory
     #[Pure]
     private function buildEmailLinkScrapingChargeDataProvider(object $config): EmailLinkScrapingChargeDataProvider
     {
-        return new EmailLinkScrapingChargeDataProvider();
+        return new EmailLinkScrapingChargeDataProvider(
+            $config->linkXPath,
+            $config->amountXPath,
+            $config->chargedAtXPath,
+            $config->chargedAtFormat,
+            $config->dateLocale ?? null,
+            $config->clickBeforeXPath ?? null,
+        );
     }
 }

@@ -34,18 +34,15 @@ class EmailTrigger implements Trigger
             // Get last email's ID
             $lastEmailId = $emails->getMessages()[0]->getId();
 
-            // Get last email content and attachments
+            // Get last email parts
             $lastEmail = $gmailService->users_messages->get('me', $lastEmailId);
             $lastEmailParts = collect($lastEmail->getPayload()->getParts());
 
-            if ($lastEmailParts->isEmpty()) {
-                // Get email's body
-                $emailBody = Base64Url::decode($lastEmail->getPayload()->getBody()->data);
-            } else {
-                // TODO: get email's body when Google Message body is a container MIME message parts.
-            }
+            // Get email's body
+            $emailBody = $this->getHtmlBody($lastEmail->getPayload());
 
             // Get email's attachments
+            // TODO: refactor and make recursive
             $pdfAttachmentParts = $lastEmailParts->filter(fn(Gmail\MessagePart $part) => $part->getMimeType() == 'application/pdf');
 
             $pdfAttachments = collect();
@@ -69,5 +66,27 @@ class EmailTrigger implements Trigger
             Log::error(__CLASS__ . '::' . __METHOD__ . ' - ' . $e->getMessage());
             return new TriggerResult(false);
         }
+    }
+
+    /**
+     * Find recursively the first MessagePart with "text/html" MIME type and return its decoded body's data (HTML string).
+     * If no MessagePart is found then null is returned instead.
+     * @param Gmail\MessagePart $messagePart
+     * @return string|null
+     */
+    private function getHtmlBody(Gmail\MessagePart $messagePart): ?string
+    {
+        if ($messagePart->getMimeType() == 'text/html') {
+            return Base64Url::decode($messagePart->getBody()->data);
+        }
+
+        foreach ($messagePart->getParts() as $part) {
+            $found = $this->getHtmlBody($part);
+            if ($found != null) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 }
