@@ -14,7 +14,8 @@
         "laravel/framework": "^9.2",
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
-        "spomky-labs/base64url": "^2.0"
+        "spomky-labs/base64url": "^2.0",
+        "symfony/dom-crawler": "^6.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",

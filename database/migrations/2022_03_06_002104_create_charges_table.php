@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -19,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignIdFor(RecurringExpense::class);
             $table->integer("amount", unsigned: true);
-            $table->dateTime("charged_at");
+            $table->date("charged_at");
             $table->boolean("draft");
             // TODO: add date for draft?
         });
