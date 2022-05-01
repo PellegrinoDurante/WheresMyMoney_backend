@@ -1,0 +1,30 @@
+services:
+    wmm_be:
+        build: ./wmm_be
+        image: wmm_be
+        env_file: .env
+        ports:
+            - '809:80'
+            - '4439:443'
+        networks:
+            - wmm
+    wmm_db:
+        build: ./wmm_db
+        image: wmm_db
+        ports:
+            - '${FORWARD_DB_PORT:-3306}:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        networks:
+            - wmm
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+            retries: 3
+            timeout: 5s
+networks:
+    wmm:
+        driver: bridge

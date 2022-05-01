@@ -75,7 +75,7 @@ class GoogleAuthenticationService
         $client->setAccessType("offline");
 
         $redirectUri = route("auth.google.redirect", absolute: false);
-        $client->setRedirectUri("http://localhost" . $redirectUri);
+        $client->setRedirectUri(env('APP_URL') . $redirectUri);
 
         $client->setTokenCallback(function ($cacheKey, $accessToken) use ($userId) {
             $this->storeAccessToken([
