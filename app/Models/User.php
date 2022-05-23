@@ -48,6 +48,12 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User wherePassword($value)
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property string|null $two_factor_confirmed_at
+ * @method static Builder|User whereTwoFactorConfirmedAt($value)
+ * @method static Builder|User whereTwoFactorRecoveryCodes($value)
+ * @method static Builder|User whereTwoFactorSecret($value)
  */
 class User extends Authenticatable
 {

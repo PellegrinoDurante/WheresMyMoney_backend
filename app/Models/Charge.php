@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Eloquent;
+use Barryvdh\LaravelIdeHelper\Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property float $amount
  * @property string $charged_at
  * @property boolean $draft
+ * @property-read RecurringExpense|null $recurringExpense
  * @method static Builder|Charge newModelQuery()
  * @method static Builder|Charge newQuery()
  * @method static Builder|Charge query()
@@ -43,4 +45,9 @@ class Charge extends Model
     protected $casts = [
         "draft" => "bool"
     ];
+
+    public function recurringExpense(): BelongsTo
+    {
+        return $this->belongsTo(RecurringExpense::class);
+    }
 }

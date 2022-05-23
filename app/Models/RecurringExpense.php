@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Eloquent;
+use Barryvdh\LaravelIdeHelper\Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,6 +40,7 @@ use Illuminate\Support\Carbon;
  */
 class RecurringExpense extends Model
 {
+
     use HasFactory;
 
     protected $fillable = [
@@ -54,6 +55,11 @@ class RecurringExpense extends Model
         "trigger" => "object",
         "charge_data_provider" => "object",
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new OwnedByUserScope());
+    }
 
     public function charges(): HasMany
     {

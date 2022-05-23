@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RecurringExpense;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RecurringExpenseController extends Controller
 {
@@ -31,7 +32,7 @@ class RecurringExpenseController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $recurringExpense = RecurringExpense::create($request->all());
+        $recurringExpense = Auth::user()->recurringExpenses()->create($request->all());
         return response()->json($recurringExpense, 201);
     }
 
