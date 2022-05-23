@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\BrowserAutomationServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
+        App\Providers\IgnitionSolutionServiceProvider::class,
 
     ],
 
