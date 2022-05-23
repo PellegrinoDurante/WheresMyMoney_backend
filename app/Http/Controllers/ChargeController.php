@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class ChargeController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(RecurringExpense::class, 'charge');
+    }
+
     /**
      * Display a listing of the resource.
      *
