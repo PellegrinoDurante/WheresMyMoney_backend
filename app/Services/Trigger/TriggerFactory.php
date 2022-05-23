@@ -10,6 +10,7 @@ class TriggerFactory
      * Create a Trigger based on the given configuration.
      *
      * @param object $config
+     * @param int|null $userId
      * @return Trigger
      * @throws UnsupportedTriggerTypeException
      */

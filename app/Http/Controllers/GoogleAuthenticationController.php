@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GoogleAuthenticationService;
+use Auth;
 use Google\Exception;
 use Google\Service\Gmail;
 use Illuminate\Contracts\Foundation\Application;
@@ -24,7 +25,7 @@ class GoogleAuthenticationController extends Controller
     public function loginPage(): RedirectResponse
     {
         $scopes = [Gmail::MAIL_GOOGLE_COM]; // TODO: abstract this
-        $client = $this->googleAuthenticationService->getClient(1, $scopes); // TODO: get authenticated user's ID
+        $client = $this->googleAuthenticationService->getClient(Auth::id(), $scopes);
         $googleAuthUrl = $client->createAuthUrl();
 
         return redirect()->away($googleAuthUrl);
