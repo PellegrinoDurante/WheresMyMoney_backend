@@ -23,7 +23,7 @@ class EmailTrigger implements Trigger
     public function check(): TriggerResult
     {
         try {
-            $client = $this->googleAuthenticationService->getClient($this->userId, Gmail::MAIL_GOOGLE_COM); // TODO: userId
+            $client = $this->googleAuthenticationService->getClient($this->userId, Gmail::MAIL_GOOGLE_COM);
             $gmailService = new Gmail($client);
 
             $emails = $gmailService->users_messages->listUsersMessages('me', [

@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Services\GoogleAuthenticationService;
 use Auth;
-use Google\Exception;
+use Exception;
+use Google\Exception as GoogleException;
 use Google\Service\Gmail;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class GoogleAuthenticationController extends Controller
 {
@@ -19,31 +17,31 @@ class GoogleAuthenticationController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return RedirectResponse
-     * @throws Exception
      */
-    public function loginPage(): RedirectResponse
+    public function loginPage(Request $request): RedirectResponse
     {
+        $successUrl = $request->get('redirect_url_success');
+        $errorUrl = $request->get('redirect_url_error');
         $scopes = [Gmail::MAIL_GOOGLE_COM]; // TODO: abstract this
-        $client = $this->googleAuthenticationService->getClient(Auth::id(), $scopes);
-        $googleAuthUrl = $client->createAuthUrl();
 
-        return redirect()->away($googleAuthUrl);
+        try {
+            $googleAuthUrl = $this->googleAuthenticationService->createAuthUrl(Auth::id(), $successUrl, $errorUrl, $scopes);
+            return redirect()->away($googleAuthUrl);
+
+        } catch (GoogleException|Exception $e) {
+            return redirect()->away($errorUrl);
+        }
     }
 
     /**
      * @param Request $request
-     * @return Response|Application|ResponseFactory
-     * @throws Exception
+     * @return RedirectResponse
      */
-    public function redirectPage(Request $request): Response|Application|ResponseFactory
+    public function redirectPage(Request $request): RedirectResponse
     {
-        $authorizationCode = $request->query->get("code");
-        $scopes = [Gmail::MAIL_GOOGLE_COM]; // TODO: abstract this
-
-        $accessToken = $this->googleAuthenticationService->getAccessTokenFromAuthCode($authorizationCode, 1, $scopes); // TODO: get authenticated user's ID
-        $this->googleAuthenticationService->storeAccessToken($accessToken, 1); // TODO: get authenticated user's ID
-
-        return response("Access token stored"); // TODO: return a redirect?
+        $redirectUrl = $this->googleAuthenticationService->getAccessTokenFromAuthCode($request, Auth::id());
+        return redirect()->away($redirectUrl);
     }
 }
