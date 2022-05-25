@@ -22,7 +22,7 @@ ADD https://api.github.com/repos/PellegrinoDurante/WheresMyMoney_backend/git/ref
 RUN git clone https://github.com/PellegrinoDurante/WheresMyMoney_backend.git /srv/wmm-be/
 RUN chown -R www-data:www-data /srv/wmm-be
 RUN cd /srv/wmm-be/ && composer install
-COPY --chown=www-data:www-data .env.prod /srv/wmm-be/.env
+COPY --chown=www-data:www-data .env /srv/wmm-be/.env
 COPY --chown=www-data:www-data client_secret.json /srv/wmm-be/storage/app/
 RUN cd /srv/wmm-be/ && php artisan key:generate && php artisan migrate -n
 
