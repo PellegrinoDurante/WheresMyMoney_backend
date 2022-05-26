@@ -15,7 +15,8 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    // TODO: check CORS best practices
+    'paths' => ['login', 'register', 'logout', 'api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
