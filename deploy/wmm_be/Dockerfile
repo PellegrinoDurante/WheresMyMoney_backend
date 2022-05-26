@@ -28,6 +28,7 @@ RUN cd /srv/wmm-be/ && php artisan key:generate
 
 # Copy nginx configuration and entrypoint script
 COPY wmm_be.conf /etc/nginx/sites-enabled/
+RUN rm /etc/nginx/sites-enabled/default
 COPY entrypoint.sh /etc/entrypoint.sh
 RUN chmod +x /etc/entrypoint.sh
 
