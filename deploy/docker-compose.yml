@@ -4,8 +4,8 @@ services:
         image: wmm_be
         env_file: .env
         ports:
-            - '809:80'
-            - '4439:443'
+            - '80:80'
+            - '443:443'
         networks:
             - wmm
     wmm_db:
