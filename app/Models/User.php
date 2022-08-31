@@ -36,6 +36,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read AccessToken|null $accessToken
  * @property-read Collection|RecurringExpense[] $recurringExpenses
  * @property-read int|null $recurring_expenses_count
+ * @property-read Collection|Pdf[] $pdfs
+ * @property-read int|null $pdfs_count
  * @method static UserFactory factory(...$parameters)
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
@@ -54,6 +56,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereTwoFactorConfirmedAt($value)
  * @method static Builder|User whereTwoFactorRecoveryCodes($value)
  * @method static Builder|User whereTwoFactorSecret($value)
+ * @mixin IdeHelperUser
  */
 class User extends Authenticatable
 {
@@ -97,5 +100,10 @@ class User extends Authenticatable
     public function recurringExpenses(): HasMany
     {
         return $this->hasMany(RecurringExpense::class);
+    }
+
+    public function pdfs(): HasMany
+    {
+        return $this->hasMany(Pdf::class);
     }
 }

@@ -1,11 +1,12 @@
 <?php
 
-use App\Models\RecurringExpense;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,14 +14,11 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create("charges", function (Blueprint $table) {
+        Schema::create('pdfs', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignIdFor(RecurringExpense::class)->constrained();
-            $table->integer("amount", unsigned: true);
-            $table->date("charged_at");
-            $table->boolean("draft");
-            // TODO: add date for draft?
+            $table->foreignIdFor(User::class)->constrained();
+            $table->string('path');
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('charges');
+        Schema::dropIfExists('pdfs');
     }
 };

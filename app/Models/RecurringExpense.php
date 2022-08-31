@@ -37,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|RecurringExpense whereTrigger($value)
  * @method static Builder|RecurringExpense whereChargeDataProvider($value)
  * @method static Builder|RecurringExpense whereLastTriggerRef($value)
+ * @mixin IdeHelperRecurringExpense
  */
 class RecurringExpense extends Model
 {
@@ -44,16 +45,16 @@ class RecurringExpense extends Model
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "description",
-        "trigger",
-        "charge_data_provider",
-        "last_trigger_ref",
+        'name',
+        'description',
+        'trigger',
+        'charge_data_provider',
+        'last_trigger_ref',
     ];
 
     protected $casts = [
-        "trigger" => "object",
-        "charge_data_provider" => "object",
+        'trigger' => 'object',
+        'charge_data_provider' => 'object',
     ];
 
     protected static function booted()

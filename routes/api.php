@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChargeController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RecurringExpenseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,4 +24,6 @@ Route::middleware('auth:sanctum')->group(function() {
 
     Route::apiResource('recurring_expenses', RecurringExpenseController::class);
     Route::apiResource('recurring_expenses.charges', ChargeController::class);
+    Route::apiResource('pdfs', PdfController::class)->only(['store', 'show', 'destroy']);
+    Route::get('/pdfs/{pdf}/page/{page}', [PdfController::class, 'getPageAsImage']);
 });

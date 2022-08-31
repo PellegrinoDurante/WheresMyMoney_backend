@@ -6,6 +6,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -31,10 +32,22 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property int $user_id
  * @method static Builder|AccessToken whereUserId($value)
+ * @property-read \App\Models\User $user
+ * @mixin IdeHelperAccessToken
  */
 class AccessToken extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["user_id", "access_token", "refresh_token", "expires_in", "created"];
+    protected $fillable = ['user_id',
+        'access_token',
+        'refresh_token',
+        'expires_in',
+        'created',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

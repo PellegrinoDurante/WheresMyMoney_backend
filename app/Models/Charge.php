@@ -31,19 +31,20 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Charge whereAmount($value)
  * @method static Builder|Charge whereChargedAt($value)
  * @method static Builder|Charge whereDraft($value)
+ * @mixin IdeHelperCharge
  */
 class Charge extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "amount",
-        "charged_at",
-        "draft"
+        'amount',
+        'charged_at',
+        'draft'
     ];
 
     protected $casts = [
-        "draft" => "bool"
+        'draft' => 'bool'
     ];
 
     public function recurringExpense(): BelongsTo
