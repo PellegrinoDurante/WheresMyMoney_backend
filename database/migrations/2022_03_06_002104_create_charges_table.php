@@ -16,7 +16,7 @@ return new class extends Migration {
         Schema::create("charges", function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignIdFor(RecurringExpense::class)->constrained();
+            $table->foreignIdFor(RecurringExpense::class);
             $table->integer("amount", unsigned: true);
             $table->date("charged_at");
             $table->boolean("draft");

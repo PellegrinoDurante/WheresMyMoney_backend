@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('recurring_expenses', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(User::class);
             $table->string('name');
             $table->text('description')->nullable();
             $table->json('trigger');

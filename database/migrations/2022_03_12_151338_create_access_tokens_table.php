@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('access_tokens', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(User::class);
             $table->string("access_token");
             $table->string("refresh_token");
             $table->integer("expires_in");

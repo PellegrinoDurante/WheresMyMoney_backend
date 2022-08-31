@@ -3,7 +3,8 @@ FROM php:8.1-fpm
 # Install PHP extensions
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions && \
-  install-php-extensions bcmath curl dom mbstring pdo_mysql pdo_pgsql zip @composer
+  install-php-extensions bcmath curl dom imagick mbstring pdo_mysql pdo_pgsql zip @composer && \
+  sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
 # Install git and nginx
 RUN apt-get update && apt-get install -y git nginx
@@ -24,7 +25,7 @@ RUN chown -R www-data:www-data /srv/wmm-be
 RUN cd /srv/wmm-be/ && composer install
 COPY --chown=www-data:www-data .env /srv/wmm-be/.env
 COPY --chown=www-data:www-data client_secret.json /srv/wmm-be/storage/app/
-RUN cd /srv/wmm-be/ && php artisan key:generate
+RUN cd /srv/wmm-be/ && php artisan key:generate #todo remove this from dockerfile
 
 # Copy nginx configuration and entrypoint script
 COPY wmm_be.conf /etc/nginx/sites-enabled/
