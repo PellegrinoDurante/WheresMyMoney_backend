@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Eloquent;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -58,7 +59,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereTwoFactorSecret($value)
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -105,5 +106,10 @@ class User extends Authenticatable
     public function pdfs(): HasMany
     {
         return $this->hasMany(Pdf::class);
+    }
+
+    public function canAccessFilament(): bool
+    {
+        return true;
     }
 }
