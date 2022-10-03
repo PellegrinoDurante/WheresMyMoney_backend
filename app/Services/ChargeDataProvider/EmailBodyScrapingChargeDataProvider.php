@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class EmailBodyScrapingChargeDataProvider implements ChargeDataProvider
 {
-    const TYPE = "email_body";
+    const TYPE = "email_body_scraping";
 
     public function __construct(
         private string  $amountXPath,

@@ -38,13 +38,14 @@ class Charge extends Model
     use HasFactory;
 
     protected $fillable = [
+        'recurring_expense_id',
         'amount',
         'charged_at',
-        'draft'
+        'draft',
     ];
 
     protected $casts = [
-        'draft' => 'bool'
+        'draft' => 'bool',
     ];
 
     public function recurringExpense(): BelongsTo

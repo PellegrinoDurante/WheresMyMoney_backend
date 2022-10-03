@@ -69,7 +69,7 @@ class GoogleAuthenticationService
 
             return $state['success_url'];
 
-        } catch (AuthorizationException|GoogleException $e) {
+        } catch (AuthorizationException | GoogleException $e) {
             return $state['error_url'];
         }
     }

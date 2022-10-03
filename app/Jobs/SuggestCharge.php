@@ -95,7 +95,7 @@ class SuggestCharge implements ShouldQueue
     private function createDraftCharge(ChargeData $chargeData): void
     {
         $this->recurringExpense->charges()->create([
-            "amount" => intval(round($chargeData->amount * 100, 2)),
+            "amount" => $chargeData->amount,
             "charged_at" => $chargeData->chargedAt,
             "draft" => true,
         ]);

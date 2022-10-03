@@ -9,6 +9,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
+        "ext-imagick": "*",
+        "doctrine/dbal": "^3.4",
+        "filament/filament": "^2.0",
+        "flowframe/laravel-trend": "^0.1.1",
         "google/apiclient": "^2.12.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/fortify": "^1.13",
@@ -16,8 +20,7 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "spomky-labs/base64url": "^2.0",
-        "symfony/dom-crawler": "^6.0",
-        "ext-imagick": "*"
+        "symfony/dom-crawler": "^6.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
@@ -51,7 +54,8 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan filament:upgrade"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

@@ -41,7 +41,6 @@ use Illuminate\Support\Carbon;
  */
 class RecurringExpense extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
