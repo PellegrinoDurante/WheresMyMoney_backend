@@ -16,13 +16,18 @@ class AverageExpenses extends BaseWidget
         $averageExpenses = $chargeService->getMonthAverage();
         $lastAverageExpense = $chargeService->getMonthAverage(now()->subMonth());
         $increased = $averageExpenses > $lastAverageExpense;
-        $changePercentage = ($averageExpenses - $lastAverageExpense) / $lastAverageExpense * 100;
 
-        return [
-            Card::make('Average monthly expenses', Money::EUR($averageExpenses, true))
+        $card = Card::make('Average monthly expenses', Money::EUR($averageExpenses, true));
+
+        if ($lastAverageExpense > 0) {
+            $changePercentage = ($averageExpenses - $lastAverageExpense) / $lastAverageExpense * 100;
+
+            $card
                 ->description(sprintf('%d%% %s from last month', $changePercentage, $increased ? 'increase' : 'decrease'))
                 ->descriptionIcon($increased ? 'heroicon-s-trending-up' : 'heroicon-s-trending-down')
-                ->descriptionColor($increased ? 'danger' : 'success'),
-        ];
+                ->descriptionColor($increased ? 'danger' : 'success');
+        }
+
+        return [$card];
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * App\Models\Charge
@@ -49,6 +50,15 @@ class Charge extends Model
         'draft' => 'bool',
     ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope('belongs_to_logged_user', function (Builder $query) {
+            $query->whereHas('recurringExpense', function (Builder $query) {
+                $query->where('user_id', Auth::id());
+            });
+        });
+    }
+
     public function recurringExpense(): BelongsTo
     {
         return $this->belongsTo(RecurringExpense::class);
@@ -57,8 +67,8 @@ class Charge extends Model
     protected function amount(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value / 100,
-            set: fn ($value) => $value * 100
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100
         );
     }
 }
