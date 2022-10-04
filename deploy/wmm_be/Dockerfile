@@ -25,7 +25,7 @@ RUN cd /srv/wmm-be/ && composer install
 COPY --chown=www-data:www-data .env /srv/wmm-be/.env
 COPY --chown=www-data:www-data client_secret.json /srv/wmm-be/storage/app/
 RUN cd /srv/wmm-be/ && php artisan key:generate #todo remove this from dockerfile
-RUN (crontab -l 2>/dev/null; echo "* * * * * cd /srv/wmm-be && /usr/bin/local/php artisan schedule:run >> /dev/null 2>&1") | crontab -
+RUN (crontab -l 2>/dev/null; echo "* * * * * cd /srv/wmm-be && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Copy nginx configuration and entrypoint script
 COPY wmm_be.conf /etc/nginx/sites-enabled/
