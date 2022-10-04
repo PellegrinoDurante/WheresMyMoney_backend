@@ -6,8 +6,14 @@ return [
     'trigger' => [
         'title' => 'Trigger',
         'description' => 'The trigger is used to determine if and when a new charge should be created.',
-        'temporal' => 'Date and time',
-        'email' => 'Email received',
+        'temporal' => [
+            'title' => 'Date and time',
+            'cron' => 'Cron expression',
+        ],
+        'email' => [
+            'title' => 'Email received',
+            'subject' => 'Email subject',
+        ],
     ],
     'charge_data_provider' => [
         'title' => 'Data Reader',

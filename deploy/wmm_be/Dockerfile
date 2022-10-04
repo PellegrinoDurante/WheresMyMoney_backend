@@ -6,16 +6,15 @@ RUN chmod +x /usr/local/bin/install-php-extensions && \
   install-php-extensions bcmath curl dom imagick mbstring pdo_mysql pdo_pgsql zip @composer && \
   sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
 
-# Install git and nginx
-RUN apt-get update && apt-get install -y git nginx
+# Install required packages
+RUN apt-get update && apt-get install -y git nginx wget cron
 
 # Install pdf2json
 RUN git clone https://github.com/PellegrinoDurante/pdf2json.git && cd pdf2json \
    && ./configure && make && make install
 
 ## Install Google Chrome for Laravel Dusk
-RUN apt-get install wget -y \
-  && cd /tmp && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+RUN cd /tmp && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
   && apt install -y ./google-chrome-stable_current_amd64.deb
 
 # Install app
@@ -26,6 +25,7 @@ RUN cd /srv/wmm-be/ && composer install
 COPY --chown=www-data:www-data .env /srv/wmm-be/.env
 COPY --chown=www-data:www-data client_secret.json /srv/wmm-be/storage/app/
 RUN cd /srv/wmm-be/ && php artisan key:generate #todo remove this from dockerfile
+RUN (crontab -l 2>/dev/null; echo "* * * * * cd /srv/wmm-be && /usr/bin/local/php artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Copy nginx configuration and entrypoint script
 COPY wmm_be.conf /etc/nginx/sites-enabled/
