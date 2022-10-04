@@ -10,7 +10,6 @@ use App\Services\ChargeDataProvider\EmailLinkScrapingChargeDataProvider;
 use App\Services\ChargeDataProvider\UserDefinedChargeDataProvider;
 use App\Services\Trigger\EmailTrigger;
 use App\Services\Trigger\TemporalTrigger;
-use Auth;
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -45,13 +44,14 @@ class RecurringExpenseResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('trigger_type')
                             ->options([
-                                TemporalTrigger::TYPE => __(sprintf('recurring_expense.trigger.%s', TemporalTrigger::TYPE)),
-                                EmailTrigger::TYPE => __(sprintf('recurring_expense.trigger.%s', EmailTrigger::TYPE)),
+                                TemporalTrigger::TYPE => __(sprintf('recurring_expense.trigger.%s.title', TemporalTrigger::TYPE)),
+                                EmailTrigger::TYPE => __(sprintf('recurring_expense.trigger.%s.title', EmailTrigger::TYPE)),
                             ])
                             ->reactive(),
 
                         Forms\Components\Group::make([
-                            Forms\Components\DateTimePicker::make('trigger_user_defined_date_time')
+                            Forms\Components\TextInput::make('trigger_user_defined_cron')
+                                ->label(__('recurring_expense.trigger.temporal.cron'))
                         ])->hidden(fn(Closure $get) => $get('trigger_type') != TemporalTrigger::TYPE),
 
                         Forms\Components\Group::make([
@@ -59,9 +59,8 @@ class RecurringExpenseResource extends Resource
                                 ->view('google')
                                 ->hidden(fn(Closure $get) => Auth::user()->accessToken()->exists()),*/
 
-                            Forms\Components\Group::make([
-                                Forms\Components\TextInput::make('trigger_email_subject'),
-                            ])->hidden(fn(Closure $get) => !Auth::user()->accessToken()->exists()),
+                            Forms\Components\TextInput::make('trigger_email_subject')
+                                ->label(__('recurring_expense.trigger.email.subject')),
                         ])->hidden(fn(Closure $get) => $get('trigger_type') != EmailTrigger::TYPE),
                     ]),
 

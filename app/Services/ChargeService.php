@@ -14,7 +14,7 @@ class ChargeService
 
         return Charge::whereDate('charged_at', '>=', $relativeTo->subYear())
                 ->whereDate('charged_at', '<=', $relativeTo)
-                ->sum('amount') /100 / 12;
+                ->sum('amount') / 100 / 12;
     }
 
     public function getAverageOfLastYear(CarbonInterface $relativeTo = null): Collection
