@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Recurring Expense',
     'name' => 'Name',
     'description' => 'Description',
     'trigger' => [
