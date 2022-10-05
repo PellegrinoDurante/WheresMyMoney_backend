@@ -187,7 +187,7 @@ class RecurringExpenseResource extends Resource
                     ->label(__('recurring_expense.name')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('recurring_expense.created_at'))
-                    ->dateTime(),
+                    ->date(),
             ])
             ->filters([
                 //

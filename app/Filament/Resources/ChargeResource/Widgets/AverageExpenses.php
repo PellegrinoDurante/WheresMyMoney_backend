@@ -23,7 +23,7 @@ class AverageExpenses extends BaseWidget
             $changePercentage = ($averageExpenses - $lastAverageExpense) / $lastAverageExpense * 100;
 
             $card
-                ->description(sprintf('%d%% %s from last month', $changePercentage, $increased ? 'increase' : 'decrease'))
+                ->description(sprintf('%d%% %s from last month', abs($changePercentage), $increased ? 'increase' : 'decrease'))
                 ->descriptionIcon($increased ? 'heroicon-s-trending-up' : 'heroicon-s-trending-down')
                 ->descriptionColor($increased ? 'danger' : 'success');
         }

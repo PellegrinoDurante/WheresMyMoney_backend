@@ -25,6 +25,7 @@ class ChargeResource extends Resource
                     ->relationship('recurringExpense', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('amount')
+                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(prefix: '€', isSigned: false))
                     ->required(),
                 Forms\Components\DatePicker::make('charged_at')
                     ->required(),
@@ -37,12 +38,9 @@ class ChargeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('recurring_expense_id'),
-                Tables\Columns\TextColumn::make('amount'),
+                Tables\Columns\TextColumn::make('recurringExpense.name'),
+                Tables\Columns\TextColumn::make('amount')
+                    ->money('eur', true),
                 Tables\Columns\TextColumn::make('charged_at')
                     ->date(),
                 Tables\Columns\BooleanColumn::make('draft'),
