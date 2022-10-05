@@ -1,6 +1,6 @@
 # fly.toml file generated for wheresmymoney-test on 2022-05-01T21:43:09+02:00
 
-app = "wheresmymoney-test"
+app = "wmm"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
