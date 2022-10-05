@@ -9,6 +9,7 @@ use Google\Exception as GoogleException;
 use Google\Service\Gmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class GoogleAuthenticationController extends Controller
 {
@@ -31,6 +32,7 @@ class GoogleAuthenticationController extends Controller
             return redirect()->away($googleAuthUrl);
 
         } catch (GoogleException|Exception $e) {
+            Log::error($e->getMessage());
             return redirect()->away($errorUrl);
         }
     }
