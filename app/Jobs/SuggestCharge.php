@@ -10,11 +10,13 @@ use App\Services\ChargeDataProvider\UnsupportedChargeDataProviderTypeException;
 use App\Services\Trigger\TriggerFactory;
 use App\Services\Trigger\TriggerResult;
 use App\Services\Trigger\UnsupportedTriggerTypeException;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Log;
 
 class SuggestCharge implements ShouldQueue
 {
@@ -37,27 +39,32 @@ class SuggestCharge implements ShouldQueue
      */
     public function handle(TriggerFactory $triggerFactory, ChargeDataProviderFactory $chargeDataProviderFactory)
     {
-        // TODO: handle exceptions
+        try {
+            // Check if trigger is triggered
+            $triggerResult = $this->getTriggerResult($triggerFactory);
 
-        // Check if trigger is triggered
-        $triggerResult = $this->getTriggerResult($triggerFactory);
+            // Return if it is not triggered or current trigger ref is the same as the last one executed
+            if (!$this->canCreateDraftCharge($triggerResult)) {
+                Log::info(sprintf('Charge triggered but duplicate for recurring expense %s', $this->recurringExpense->id));
+                return;
+            }
 
-        // Return if it is not triggered or current trigger ref is the same as the last one executed
-        if (!$this->canCreateDraftCharge($triggerResult)) {
-            return;
+            Log::info(sprintf('Charge triggered for recurring expense %s', $this->recurringExpense->id));
+
+            // Otherwise, continue getting the charge data with the provider
+            $chargeData = $this->getChargeData($chargeDataProviderFactory, $triggerResult);
+
+            // Add a new draft charge
+            $this->createDraftCharge($chargeData);
+
+            // Save ref of this trigger to avoid duplicates
+            $this->saveLastTriggerReference($triggerResult);
+
+            // TODO: send a notification for the new draft charge
+            $this->sendNotification();
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
         }
-
-        // Otherwise, continue getting the charge data with the provider
-        $chargeData = $this->getChargeData($chargeDataProviderFactory, $triggerResult);
-
-        // Add a new draft charge
-        $this->createDraftCharge($chargeData);
-
-        // Save ref of this trigger to avoid duplicates
-        $this->saveLastTriggerReference($triggerResult);
-
-        // TODO: send a notification for the new draft charge
-        $this->sendNotification();
     }
 
     /**
@@ -99,6 +106,8 @@ class SuggestCharge implements ShouldQueue
             "charged_at" => $chargeData->chargedAt,
             "draft" => true,
         ]);
+
+        Log::info('New draft charge created.');
     }
 
     /**

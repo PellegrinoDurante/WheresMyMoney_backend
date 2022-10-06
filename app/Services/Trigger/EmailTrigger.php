@@ -60,7 +60,7 @@ class EmailTrigger implements Trigger
                 'attachments' => $pdfAttachments,
             ];
 
-            return new TriggerResult($lastEmailId, triggerRef: $lastEmailId, context: $context);
+            return new TriggerResult(true, triggerRef: $lastEmailId, context: $context);
 
         } catch (Exception $e) {
             Log::error(__CLASS__ . '::' . __METHOD__ . ' - ' . $e->getMessage());
