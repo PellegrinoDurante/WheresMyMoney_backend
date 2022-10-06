@@ -25,7 +25,7 @@ class CreateRecurringExpense extends CreateRecord
 
         switch ($data['trigger_type']) {
             case TemporalTrigger::TYPE:
-                $trigger['cron'] = $data['trigger_user_defined_date_time'];
+                $trigger['cron'] = $data['trigger_user_defined_cron'];
                 break;
 
             case EmailTrigger::TYPE:
