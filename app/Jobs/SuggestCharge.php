@@ -10,13 +10,13 @@ use App\Services\ChargeDataProvider\UnsupportedChargeDataProviderTypeException;
 use App\Services\Trigger\TriggerFactory;
 use App\Services\Trigger\TriggerResult;
 use App\Services\Trigger\UnsupportedTriggerTypeException;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Log;
+use Throwable;
 
 class SuggestCharge implements ShouldQueue
 {
@@ -37,7 +37,7 @@ class SuggestCharge implements ShouldQueue
      *
      * @return void
      */
-    public function handle(TriggerFactory $triggerFactory, ChargeDataProviderFactory $chargeDataProviderFactory)
+    public function handle(TriggerFactory $triggerFactory, ChargeDataProviderFactory $chargeDataProviderFactory): void
     {
         try {
             // Check if trigger is triggered
@@ -62,7 +62,7 @@ class SuggestCharge implements ShouldQueue
 
             // TODO: send a notification for the new draft charge
             $this->sendNotification();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error($e->getMessage());
         }
     }
