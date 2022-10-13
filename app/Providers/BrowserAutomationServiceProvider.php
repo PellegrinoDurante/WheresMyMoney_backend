@@ -26,7 +26,7 @@ class BrowserAutomationServiceProvider extends ServiceProvider
             $options = (new ChromeOptions())->addArguments(config('automation.chrome.arguments'));
 
             return RemoteWebDriver::create(
-                env('REMOTE_WEB_DRIVER_URI', 'http://selenium:4444/wd/hub'),
+                config('automation.driver_uri'),
                 DesiredCapabilities::chrome()->setCapability(
                     ChromeOptions::CAPABILITY,
                     $options
