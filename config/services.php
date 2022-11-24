@@ -30,4 +30,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'nordigen' => [
+        'client_id' => env('NORDIGEN_SECRET_ID'),
+        'client_secret' => env('NORDIGEN_SECRET_KEY'),
+        'redirect' => ''
+    ],
+
 ];

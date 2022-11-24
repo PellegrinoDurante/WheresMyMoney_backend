@@ -18,7 +18,9 @@
         "laravel/fortify": "^1.13",
         "laravel/framework": "^9.2",
         "laravel/sanctum": "^2.14.1",
+        "laravel/socialite": "^5.5",
         "laravel/tinker": "^2.7",
+        "nordigen/nordigen-php": "^1.0",
         "spomky-labs/base64url": "^2.0",
         "symfony/dom-crawler": "^6.0"
     },

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -32,22 +31,43 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property int $user_id
  * @method static Builder|AccessToken whereUserId($value)
- * @property-read \App\Models\User $user
+ * @property-read User $user
  * @mixin IdeHelperAccessToken
+ * @property string $name
+ * @property string $type
+ * @property string $provider
+ * @method static Builder|AccessToken user(\App\Models\User $user)
+ * @method static Builder|AccessToken whereName($value)
+ * @method static Builder|AccessToken whereProvider($value)
+ * @method static Builder|AccessToken whereType($value)
+ * @method static Builder|AccessToken ofUser(\App\Models\User $user)
  */
 class AccessToken extends Model
 {
-    use HasFactory;
 
-    protected $fillable = ['user_id',
+    const PROVIDER_GOOGLE = 'google';
+    const PROVIDER_NORDIGEN = 'nordigen';
+    const PROVIDER_BANK = 'bank';
+
+    const TYPE_BANK = 'bank';
+
+    protected $fillable = [
+        'user_id',
+        'name',
+        'type',
+        'provider',
         'access_token',
         'refresh_token',
         'expires_in',
-        'created',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeOfUser(Builder $query, User $user)
+    {
+        $query->where('user_id', '=', $user->id);
     }
 }

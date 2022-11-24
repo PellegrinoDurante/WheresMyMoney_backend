@@ -91,7 +91,6 @@ class GoogleAuthenticationService
                 "access_token" => $storedAccessToken->access_token,
                 "refresh_token" => $storedAccessToken->refresh_token,
                 "expires_in" => $storedAccessToken->expires_in,
-                "created" => $storedAccessToken->created,
             ]);
         }
 
@@ -142,7 +141,6 @@ class GoogleAuthenticationService
             $this->storeAccessToken([
                 "access_token" => $accessToken,
                 "expires_in" => 3600,
-                "created" => time(),
             ], $userId);
         });
 

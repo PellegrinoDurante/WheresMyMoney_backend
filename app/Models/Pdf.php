@@ -24,6 +24,12 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Pdf query()
  * @mixin Eloquent
  * @mixin IdeHelperPdf
+ * @method static \Database\Factories\PdfFactory factory(...$parameters)
+ * @method static Builder|Pdf whereCreatedAt($value)
+ * @method static Builder|Pdf whereId($value)
+ * @method static Builder|Pdf wherePath($value)
+ * @method static Builder|Pdf whereUpdatedAt($value)
+ * @method static Builder|Pdf whereUserId($value)
  */
 class Pdf extends Model
 {
