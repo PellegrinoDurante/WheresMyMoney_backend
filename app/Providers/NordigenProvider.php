@@ -21,6 +21,7 @@ class NordigenProvider extends AbstractProvider
     {
         $session = $this->nordigenServer->initSession($this->parameters['institutionId'], route('auth.callback', [
             'driver' => 'nordigen',
+            'name' => $this->parameters['name'],
             'state' => $state,
         ]));
 

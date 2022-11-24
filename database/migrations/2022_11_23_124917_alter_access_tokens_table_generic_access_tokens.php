@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('type', 64)->after('name');
             $table->string('provider', 128)->after('type');
             $table->dropColumn('created');
+            $table->softDeletes();
         });
     }
 
@@ -30,6 +31,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('access_tokens', function (Blueprint $table) {
+            $table->dropSoftDeletes();
             $table->integer('created');
             $table->dropColumn('provider');
             $table->dropColumn('type');

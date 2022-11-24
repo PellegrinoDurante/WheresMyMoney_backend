@@ -4,24 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\AccessToken;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-    }
-
-    public function redirect(string $driver): RedirectResponse|Response
+    public function redirect(string $driver, Request $request): RedirectResponse|Response
     {
         return Socialite::driver($driver)
-            ->with(['institutionId' => 'TODO'])
+            ->with([
+                'institutionId' => $request->get('institutionId'),
+                'name' => $request->get('name'),
+            ])
             ->redirect();
     }
 
-    public function callback(string $driver): RedirectResponse
+    public function callback(string $driver, Request $request): RedirectResponse
     {
         /** @var User $user */
         $user = Socialite::driver($driver)->user();
@@ -30,7 +30,7 @@ class AuthController extends Controller
             case 'nordigen':
                 AccessToken::create([
                     'user_id' => \Auth::id(),
-                    'name' => '',
+                    'name' => $request->get('name'),
                     'type' => AccessToken::TYPE_BANK,
                     'provider' => AccessToken::PROVIDER_BANK,
                     'access_token' => $user->token,

@@ -3,7 +3,8 @@
 namespace App\Services\BankService;
 
 use App\Models\AccessToken;
-use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Nordigen\NordigenPHP\API\Account;
 use Nordigen\NordigenPHP\API\NordigenClient;
 
@@ -19,9 +20,18 @@ class NordigenService implements BankServiceInterface
         $this->clientSecret = config('services.nordigen.client_secret');
     }
 
-    function getTransactions(): array
+    public function getBanksList(string $countryCode = 'IT'): Collection
     {
-        return $this->account()->getAccountTransactions("2022-11-01", "2022-11-23");
+        return collect($this->client()->institution->getInstitutionsByCountry($countryCode));
+    }
+
+    public function getBalance(AccessToken $accessToken): float
+    {
+        return $this->account($accessToken)->getAccountBalances()['balances'][0]['balanceAmount']['amount'];
+    }
+    public function getTransactions(AccessToken $accessToken, Carbon $dateFrom, Carbon $dateTo): Collection
+    {
+        return collect($this->account($accessToken)->getAccountTransactions($dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d')));
     }
 
     public function initSession(string $institutionId, string $redirect): array
@@ -64,19 +74,19 @@ class NordigenService implements BankServiceInterface
         return $client;
     }
 
-    private function account(): Account
+    private function account(AccessToken $accessToken): Account
     {
-        $bankAccessToken = AccessToken::ofUser(\Auth::user())
-            ->where('type', '=', AccessToken::TYPE_BANK)
-            ->where('provider', '=', AccessToken::PROVIDER_BANK)
-            ->first();
+//        $bankAccessToken = AccessToken::ofUser(\Auth::user())
+//            ->where('type', '=', AccessToken::TYPE_BANK)
+//            ->where('provider', '=', AccessToken::PROVIDER_BANK)
+//            ->first();
+//
+//        // TODO: handle bank access token / requisition ID expiration
+//        if ($bankAccessToken == null) {
+//            throw new UnauthorizedException(); // TODO: add custom exception
+//        }
 
-        // TODO: handle bank access token / requisition ID expiration
-        if ($bankAccessToken == null) {
-            throw new UnauthorizedException(); // TODO: add custom exception
-        }
-
-        $requisitionData = $this->client()->requisition->getRequisition($bankAccessToken->access_token);
+        $requisitionData = $this->client()->requisition->getRequisition($accessToken->access_token);
         $accountId = $requisitionData["accounts"][0];
         return $this->client()->account($accountId);
     }
