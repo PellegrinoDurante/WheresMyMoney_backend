@@ -3,8 +3,12 @@
 namespace App\Services\BankService;
 
 use App\Models\AccessToken;
+use Closure;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\UnauthorizedException;
+use Log;
 use Nordigen\NordigenPHP\API\Account;
 use Nordigen\NordigenPHP\API\NordigenClient;
 
@@ -22,23 +26,45 @@ class NordigenService implements BankServiceInterface
 
     public function getBanksList(string $countryCode = 'IT'): Collection
     {
-        return collect($this->client()->institution->getInstitutionsByCountry($countryCode));
+        return $this->handleExpiration(function () use ($countryCode) {
+            return collect($this->client()->institution->getInstitutionsByCountry($countryCode));
+        });
+    }
+
+    public function getRequisition(string $requisitionId): array
+    {
+        return $this->handleExpiration(function () use ($requisitionId) {
+            return $this->client()->requisition->getRequisition($requisitionId);
+        });
     }
 
     public function getBalance(AccessToken $accessToken): float
     {
-        return $this->account($accessToken)->getAccountBalances()['balances'][0]['balanceAmount']['amount'];
+        return $this->handleExpiration(function () use ($accessToken) {
+            return $this->account($accessToken)->getAccountBalances()['balances'][0]['balanceAmount']['amount'];
+        });
     }
+
     public function getTransactions(AccessToken $accessToken, Carbon $dateFrom, Carbon $dateTo): Collection
     {
-        return collect($this->account($accessToken)->getAccountTransactions($dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d')));
+        return $this->handleExpiration(function () use ($dateTo, $dateFrom, $accessToken) {
+            return collect($this->account($accessToken)->getAccountTransactions($dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d')));
+        });
     }
 
     public function initSession(string $institutionId, string $redirect): array
     {
-        return $this->client()->initSession($institutionId, $redirect);
+        return $this->handleExpiration(function () use ($institutionId, $redirect) {
+            return $this->client()->initSession($institutionId, $redirect);
+        });
     }
 
+    /**
+     * Return the Nordigen client using saved access token.
+     * If no access token exists then a new one is created.
+     * If the existing access token is expired gets a new one using the refresh token.
+     * @return NordigenClient
+     */
     private function client(): NordigenClient
     {
         $client = new NordigenClient($this->clientId, $this->clientSecret);
@@ -49,12 +75,9 @@ class NordigenService implements BankServiceInterface
             ->where('provider', '=', AccessToken::PROVIDER_NORDIGEN)
             ->first();
 
-        // TODO: handle access token expiration
-        // If access_tokens record is expired (see expires_in column) or the response code is 401 then it should call
-        // the refresh token request, save new access_token and expires_in and retry the operation.
-        // If the refresh request also fails with 401 it means that the refresh token is expired too; proceed deleting
-        // access_tokens record and call getAccount method again to create a new access token from ground up.
+        // Create client access token id it does not exist
         if ($nordigenAccessToken == null) {
+            Log::info('Nordigen access token not found, creating a new one...');
             $accessToken = $client->createAccessToken();
 
             $nordigenAccessToken = AccessToken::create([
@@ -68,26 +91,65 @@ class NordigenService implements BankServiceInterface
             ]);
         }
 
+        // Refresh access token if expired
+        if ($this->isTokenExpired($nordigenAccessToken)) {
+            Log::info('Nordigen access token is expired, refreshing...');
+            $accessToken = $client->refreshAccessToken($nordigenAccessToken->refresh_token);
+            $nordigenAccessToken->access_token = $accessToken['access'];
+            $nordigenAccessToken->expires_in = $accessToken['access_expires'];
+            $nordigenAccessToken->expired_at = null;
+            $nordigenAccessToken->save();
+        }
+
         $client->setAccessToken($nordigenAccessToken->access_token);
         $client->setRefreshToken($nordigenAccessToken->refresh_token);
-
         return $client;
     }
 
+    /**
+     * Return the bank account associated with the given access token.
+     * @param AccessToken $accessToken
+     * @return Account
+     */
     private function account(AccessToken $accessToken): Account
     {
-//        $bankAccessToken = AccessToken::ofUser(\Auth::user())
-//            ->where('type', '=', AccessToken::TYPE_BANK)
-//            ->where('provider', '=', AccessToken::PROVIDER_BANK)
-//            ->first();
-//
-//        // TODO: handle bank access token / requisition ID expiration
-//        if ($bankAccessToken == null) {
-//            throw new UnauthorizedException(); // TODO: add custom exception
-//        }
+        $account = $this->client()->account($accessToken->access_token);
 
-        $requisitionData = $this->client()->requisition->getRequisition($accessToken->access_token);
-        $accountId = $requisitionData["accounts"][0];
-        return $this->client()->account($accountId);
+        // Check account status
+        $metadata = $account->getAccountMetaData();
+        if ($metadata['status'] !== 'READY') {
+            // TODO: account expired
+            throw new UnauthorizedException();
+        }
+
+        return $account;
+    }
+
+    private function isTokenExpired(AccessToken $nordigenAccessToken): bool
+    {
+        return $nordigenAccessToken->expired_at !== null || $nordigenAccessToken->created_at->addSeconds($nordigenAccessToken->expires_in) <= now();
+    }
+
+    private function handleExpiration(Closure $closure, ...$args)
+    {
+        try {
+            return $closure(...$args);
+        } catch (ClientException $e) {
+            if ($e->getResponse()->getStatusCode() !== 401) {
+                throw $e;
+            }
+
+            // Mark client's access token as expired and retry the operation
+            $this->expireClientAccessToken();
+            return $closure(...$args);
+        }
+    }
+
+    private function expireClientAccessToken()
+    {
+        $accessToken = $this->client()->getAccessToken();
+        AccessToken::whereAccessToken($accessToken)->first()->update([
+            'expired_at' => now(),
+        ]);
     }
 }

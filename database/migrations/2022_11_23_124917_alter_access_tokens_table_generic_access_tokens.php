@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('name', 128)->after('updated_at');
             $table->string('type', 64)->after('name');
             $table->string('provider', 128)->after('type');
+            $table->dateTime('expired_at')->nullable();
             $table->dropColumn('created');
             $table->softDeletes();
         });
@@ -33,6 +34,7 @@ return new class extends Migration {
         Schema::table('access_tokens', function (Blueprint $table) {
             $table->dropSoftDeletes();
             $table->integer('created');
+            $table->dropColumn('expired_at');
             $table->dropColumn('provider');
             $table->dropColumn('type');
             $table->dropColumn('name');

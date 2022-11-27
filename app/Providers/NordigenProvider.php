@@ -9,17 +9,17 @@ use Laravel\Socialite\Two\User;
 
 class NordigenProvider extends AbstractProvider
 {
-    private NordigenService $nordigenServer;
+    private NordigenService $nordigenService;
 
     public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl, $guzzle = [])
     {
         parent::__construct($request, $clientId, $clientSecret, $redirectUrl, $guzzle);
-        $this->nordigenServer = app(NordigenService::class);
+        $this->nordigenService = app(NordigenService::class);
     }
 
     protected function getAuthUrl($state)
     {
-        $session = $this->nordigenServer->initSession($this->parameters['institutionId'], route('auth.callback', [
+        $session = $this->nordigenService->initSession($this->parameters['institutionId'], route('auth.callback', [
             'driver' => 'nordigen',
             'name' => $this->parameters['name'],
             'state' => $state,
@@ -35,8 +35,11 @@ class NordigenProvider extends AbstractProvider
 
     public function getAccessTokenResponse($code): array
     {
+        $requisitionData = $this->nordigenService->getRequisition($code);
+        $accountId = $requisitionData["accounts"][0];
+
         return [
-            'access_token' => $code,
+            'access_token' => $accountId,
             'refresh_token' => '',
             'expires_in' => 90 * 24 * 60 * 60,
         ];

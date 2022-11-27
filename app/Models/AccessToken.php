@@ -42,6 +42,13 @@ use Illuminate\Support\Carbon;
  * @method static Builder|AccessToken whereProvider($value)
  * @method static Builder|AccessToken whereType($value)
  * @method static Builder|AccessToken ofUser(\App\Models\User $user)
+ * @property string|null $expired_at
+ * @property Carbon|null $deleted_at
+ * @method static \Illuminate\Database\Query\Builder|AccessToken onlyTrashed()
+ * @method static Builder|AccessToken whereDeletedAt($value)
+ * @method static Builder|AccessToken whereExpiredAt($value)
+ * @method static \Illuminate\Database\Query\Builder|AccessToken withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|AccessToken withoutTrashed()
  */
 class AccessToken extends Model
 {
