@@ -6,6 +6,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -37,11 +38,11 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $type
  * @property string $provider
- * @method static Builder|AccessToken user(\App\Models\User $user)
+ * @method static Builder|AccessToken user(User $user)
  * @method static Builder|AccessToken whereName($value)
  * @method static Builder|AccessToken whereProvider($value)
  * @method static Builder|AccessToken whereType($value)
- * @method static Builder|AccessToken ofUser(\App\Models\User $user)
+ * @method static Builder|AccessToken ofUser(User $user)
  * @property string|null $expired_at
  * @property Carbon|null $deleted_at
  * @method static \Illuminate\Database\Query\Builder|AccessToken onlyTrashed()
@@ -49,6 +50,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|AccessToken whereExpiredAt($value)
  * @method static \Illuminate\Database\Query\Builder|AccessToken withTrashed()
  * @method static \Illuminate\Database\Query\Builder|AccessToken withoutTrashed()
+ * @property-read Wallet|null $wallet
  */
 class AccessToken extends Model
 {
@@ -73,6 +75,11 @@ class AccessToken extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function wallet(): HasOne
+    {
+        return $this->hasOne(Wallet::class);
     }
 
     public function scopeOfUser(Builder $query, User $user)

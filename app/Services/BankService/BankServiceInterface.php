@@ -8,7 +8,11 @@ use Illuminate\Support\Collection;
 
 interface BankServiceInterface
 {
-    public function getBanksList(): Collection;
-    public function getBalance(AccessToken $accessToken): float;
-    public function getTransactions(AccessToken $accessToken, Carbon $dateFrom, Carbon $dateTo): Collection;
+    public function getInstitutions(): Collection;
+
+    public function getBalance(AccessToken $accountAccessToken): float;
+
+    public function getTransactions(AccessToken $accountAccessToken, Carbon $dateFrom, Carbon $dateTo): Collection;
+
+    public function getMinDateAllowed(AccessToken $accountAccessToken): Carbon;
 }

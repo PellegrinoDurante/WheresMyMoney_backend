@@ -12,7 +12,7 @@ use Log;
 use Nordigen\NordigenPHP\API\Account;
 use Nordigen\NordigenPHP\API\NordigenClient;
 
-class NordigenService implements BankServiceInterface
+class NordigenService extends BankServiceAbstract
 {
 
     private string $clientId;
@@ -24,31 +24,38 @@ class NordigenService implements BankServiceInterface
         $this->clientSecret = config('services.nordigen.client_secret');
     }
 
-    public function getBanksList(string $countryCode = 'IT'): Collection
+    public function getInstitutions(string $countryCode = 'IT'): Collection
     {
         return $this->handleExpiration(function () use ($countryCode) {
             return collect($this->client()->institution->getInstitutionsByCountry($countryCode));
         });
     }
 
+    public function getBalance(AccessToken $accountAccessToken): float
+    {
+        return $this->handleExpiration(function () use ($accountAccessToken) {
+            return $this->account($accountAccessToken)->getAccountBalances()['balances'][0]['balanceAmount']['amount'];
+        });
+    }
+
+    public function getTransactions(AccessToken $accountAccessToken, Carbon $dateFrom, Carbon $dateTo): Collection
+    {
+        return $this->handleExpiration(function () use ($dateTo, $dateFrom, $accountAccessToken) {
+            $accountTransactions = $this->account($accountAccessToken)->getAccountTransactions($dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d'));
+            return collect($accountTransactions['transactions']['booked']);
+        });
+    }
+
+    public function getMinDateAllowed(AccessToken $accountAccessToken): Carbon
+    {
+        // Nordigen allows access to transactions history up to 730 days
+        return now()->subDays(730);
+    }
+
     public function getRequisition(string $requisitionId): array
     {
         return $this->handleExpiration(function () use ($requisitionId) {
             return $this->client()->requisition->getRequisition($requisitionId);
-        });
-    }
-
-    public function getBalance(AccessToken $accessToken): float
-    {
-        return $this->handleExpiration(function () use ($accessToken) {
-            return $this->account($accessToken)->getAccountBalances()['balances'][0]['balanceAmount']['amount'];
-        });
-    }
-
-    public function getTransactions(AccessToken $accessToken, Carbon $dateFrom, Carbon $dateTo): Collection
-    {
-        return $this->handleExpiration(function () use ($dateTo, $dateFrom, $accessToken) {
-            return collect($this->account($accessToken)->getAccountTransactions($dateFrom->format('Y-m-d'), $dateTo->format('Y-m-d')));
         });
     }
 
@@ -125,11 +132,6 @@ class NordigenService implements BankServiceInterface
         return $account;
     }
 
-    private function isTokenExpired(AccessToken $nordigenAccessToken): bool
-    {
-        return $nordigenAccessToken->expired_at !== null || $nordigenAccessToken->created_at->addSeconds($nordigenAccessToken->expires_in) <= now();
-    }
-
     private function handleExpiration(Closure $closure, ...$args)
     {
         try {
@@ -140,16 +142,9 @@ class NordigenService implements BankServiceInterface
             }
 
             // Mark client's access token as expired and retry the operation
-            $this->expireClientAccessToken();
+            $accessToken = $this->client()->getAccessToken();
+            $this->expireAccessToken($accessToken);
             return $closure(...$args);
         }
-    }
-
-    private function expireClientAccessToken()
-    {
-        $accessToken = $this->client()->getAccessToken();
-        AccessToken::whereAccessToken($accessToken)->first()->update([
-            'expired_at' => now(),
-        ]);
     }
 }

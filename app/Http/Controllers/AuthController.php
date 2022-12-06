@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccessToken;
+use Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,7 +30,7 @@ class AuthController extends Controller
         switch ($driver) {
             case 'nordigen':
                 AccessToken::create([
-                    'user_id' => \Auth::id(),
+                    'user_id' => Auth::id(),
                     'name' => $request->get('name'),
                     'type' => AccessToken::TYPE_BANK,
                     'provider' => AccessToken::PROVIDER_BANK,
@@ -40,6 +41,6 @@ class AuthController extends Controller
                 break;
         }
 
-        return redirect('/');
+        return redirect('/admin');
     }
 }

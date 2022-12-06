@@ -31,7 +31,7 @@ class ManageAccessTokens extends ManageRecords
                     Select::make('bank_institution')
                         ->label('Banca')
                         ->options(function () use ($nordigenService) {
-                            return $nordigenService->getBanksList()->mapWithKeys(function (array $bank) {
+                            return $nordigenService->getInstitutions()->mapWithKeys(function (array $bank) {
                                 return [$bank['id'] => $bank['name']];
                             });
                         })
