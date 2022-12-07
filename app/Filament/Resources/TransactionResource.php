@@ -31,21 +31,23 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns(array(
+            ->columns([
+                Tables\Columns\TextColumn::make('spent_at')
+                    ->label(__('transactions.spent_at'))
+                    ->date(),
                 Tables\Columns\TextColumn::make('amount')
+                    ->label(__('transactions.amount'))
                     ->money('EUR'),
                 Tables\Columns\BadgeColumn::make('type')
                     ->getStateUsing(fn(Transaction $record): string => $record->amount >= 0 ? 'Entrata' : 'Uscita')
-                    ->label('Tipo')
-                    ->colors(array(
-                        'success' => fn($state) => $state === 'Entrata',
-                        'danger' => fn($state) => $state === 'Uscita',
-                    )),
-                Tables\Columns\TextColumn::make('spent_at')
-                    ->date(),
-                Tables\Columns\TextColumn::make('wallet.name'),
-
-            ))
+                    ->label(__('transactions.type'))
+                    ->colors([
+                        'success' => fn($state) => $state === __('transactions.type_income'),
+                        'danger' => fn($state) => $state === __('transactions.type_outcome'),
+                    ]),
+                Tables\Columns\TextColumn::make('wallet.name')
+                    ->label(__('transactions.wallet'))
+            ])
             ->filters([
                 //
             ])
