@@ -14,6 +14,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->string('name', 255);
+            $table->string('type', 255);
             $table->foreignIdFor(AccessToken::class)->nullable()->constrained();
         });
     }

@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property string $name
+ * @property WalletType $type
  * @property int|null $access_token_id
  * @property-read AccessToken|null $accessToken
  * @method static Builder|Wallet newModelQuery()
@@ -26,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Wallet whereDeletedAt($value)
  * @method static Builder|Wallet whereId($value)
  * @method static Builder|Wallet whereName($value)
+ * @method static Builder|Wallet whereType($value)
  * @method static Builder|Wallet whereUpdatedAt($value)
  * @mixin Eloquent
  */
@@ -33,7 +35,12 @@ class Wallet extends Model
 {
     protected $fillable = [
         'name',
+        'type',
         'access_token_id',
+    ];
+
+    protected $casts = [
+        'type' => WalletType::class,
     ];
 
     public function accessToken(): BelongsTo
@@ -41,3 +48,4 @@ class Wallet extends Model
         return $this->belongsTo(AccessToken::class);
     }
 }
+

@@ -3,12 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\WalletResource\Pages;
+use App\Models\AccessToken;
 use App\Models\Wallet;
+use App\Models\WalletType;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 
 class WalletResource extends Resource
 {
@@ -20,10 +23,29 @@ class WalletResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('access_token_id'),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('type')
+                    ->label(__('wallets.type'))
+                    ->required()
+                    ->options(function () {
+                        return WalletType::values()->mapWithKeys(
+                            fn($type) => [
+                                $type => __('wallets.type_' . $type),
+                            ]
+                        );
+                    })
+                    ->reactive(),
+                Forms\Components\Select::make('access_token_id')
+                    ->label(__('wallets.access_token'))
+                    ->relationship('accessToken', 'name', function (Builder $query) {
+                        $query->where('type', '=', AccessToken::TYPE_BANK)
+                            ->where('provider', '=', AccessToken::PROVIDER_BANK);
+                    })
+                    ->hidden(function ($get) {
+                        return $get('type') !== WalletType::Bank->value;
+                    }),
             ]);
     }
 
