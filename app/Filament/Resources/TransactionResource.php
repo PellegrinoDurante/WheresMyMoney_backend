@@ -15,16 +15,38 @@ class TransactionResource extends Resource
     protected static ?string $model = Transaction::class;
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
+    public static function getModelLabel(): string
+    {
+        return __('transactions.title');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('transactions.title_plural');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('amount')
+                    ->label(__('transactions.amount'))
+                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(prefix: '€', isSigned: false))
                     ->required(),
                 Forms\Components\DateTimePicker::make('spent_at')
+                    ->label(__('transactions.spent_at'))
                     ->required(),
-                Forms\Components\TextInput::make('metadata')
+                Forms\Components\Select::make('category_id')
+                    ->label(__('transactions.category'))
+                    ->relationship('category', 'name')
                     ->required(),
+                Forms\Components\Textarea::make('metadata')
+                    ->label(__('transactions.metadata'))
+                    ->disabled()
+                    ->required()
+                    ->afterStateHydrated(function (Forms\Components\Textarea $component, $state) {
+                        $component->state(json_encode($state));
+                    }),
             ]);
     }
 
@@ -37,14 +59,16 @@ class TransactionResource extends Resource
                     ->date(),
                 Tables\Columns\TextColumn::make('amount')
                     ->label(__('transactions.amount'))
-                    ->money('EUR'),
+                    ->money('EUR', true),
                 Tables\Columns\BadgeColumn::make('type')
-                    ->getStateUsing(fn(Transaction $record): string => $record->amount >= 0 ? 'Entrata' : 'Uscita')
                     ->label(__('transactions.type'))
+                    ->getStateUsing(fn(Transaction $record): string => $record->amount >= 0 ? 'Entrata' : 'Uscita')
                     ->colors([
                         'success' => fn($state) => $state === __('transactions.type_income'),
                         'danger' => fn($state) => $state === __('transactions.type_outcome'),
                     ]),
+                Tables\Columns\BadgeColumn::make('category.name')
+                    ->label(__('transactions.category')),
                 Tables\Columns\TextColumn::make('wallet.name')
                     ->label(__('transactions.wallet'))
             ])

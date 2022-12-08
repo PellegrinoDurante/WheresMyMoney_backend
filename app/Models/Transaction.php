@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,7 +36,10 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property int $wallet_id
  * @method static Builder|Transaction whereWalletId($value)
- * @property-read \App\Models\Wallet $wallet
+ * @property-read Wallet $wallet
+ * @property int $category_id
+ * @property-read TransactionCategory $category
+ * @method static Builder|Transaction whereCategoryId($value)
  */
 class Transaction extends Model
 {
@@ -46,14 +50,28 @@ class Transaction extends Model
         'spent_at',
         'wallet_id',
         'metadata',
+        'category_id',
     ];
 
     protected $casts = [
         'metadata' => 'array',
     ];
 
+    protected function amount(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100
+        );
+    }
+
     public function wallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(TransactionCategory::class, 'category_id');
     }
 }

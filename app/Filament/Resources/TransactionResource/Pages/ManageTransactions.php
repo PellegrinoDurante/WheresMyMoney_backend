@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource;
 use App\Models\AccessToken;
 use App\Services\BankService\NordigenService;
+use Exception;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ManageRecords;
@@ -13,6 +14,9 @@ class ManageTransactions extends ManageRecords
 {
     protected static string $resource = TransactionResource::class;
 
+    /**
+     * @throws Exception
+     */
     protected function getActions(): array
     {
         $bankService = app(NordigenService::class);

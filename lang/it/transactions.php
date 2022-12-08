@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'title' => 'Transazioni',
+    'title' => 'Transazione',
+    'title_plural' => 'Transazioni',
     'amount' => 'Importo',
     'type' => 'Tipo',
     'type_income' => 'Entrata',
@@ -10,4 +11,6 @@ return [
     'wallet' => 'Borsellino',
     'sync' => 'Sincronizza',
     'bank_account' => 'Conto bancario',
+    'category' => 'Categoria',
+    'metadata' => 'Metadata',
 ];

@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'title' => 'Transactions',
+    'title' => 'transactions',
+    'title_plural' => 'transactions',
     'amount' => 'Amount',
     'type' => 'Type',
     'type_income' => 'Income',
@@ -10,4 +11,6 @@ return [
     'wallet' => 'Wallet',
     'sync' => 'Sync',
     'bank_account' => 'Bank account',
+    'category' => 'Category',
+    'metadata' => 'Metadata',
 ];
