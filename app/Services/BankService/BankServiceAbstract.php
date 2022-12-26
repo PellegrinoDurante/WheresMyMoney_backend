@@ -11,6 +11,7 @@ abstract class BankServiceAbstract implements BankServiceInterface
     public function syncTransactions(AccessToken $accountAccessToken)
     {
         $bankTransactions = $this->getTransactions($accountAccessToken, $this->getMinDateAllowed($accountAccessToken), now());
+        \Log::info(var_export($bankTransactions, true));
         $bankTransactions->each(function (array $data) use ($accountAccessToken) {
             $transactionId = $data['internalTransactionId'] ?? $data['transactionId'] ?? null;
             $merchantName = $data['creditorName'] ?? $data['debtorName'] ?? null;
@@ -21,7 +22,7 @@ abstract class BankServiceAbstract implements BankServiceInterface
             }
 
             Transaction::create([
-                'amount' => $data['transactionAmount']['amount'] * 100,
+                'amount' => $data['transactionAmount']['amount'],
                 'spent_at' => Carbon::parse($data['bookingDate']),
                 'wallet_id' => $accountAccessToken->wallet->id,
                 'metadata' => [

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransactionResource\Pages;
 
 use App\Filament\Resources\TransactionResource;
+use App\Filament\Resources\TransactionResource\Widgets\TransactionsChart;
 use App\Models\AccessToken;
 use App\Services\BankService\NordigenService;
 use Exception;
@@ -37,6 +38,13 @@ class ManageTransactions extends ManageRecords
                         )
                 ]),
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            TransactionsChart::class,
         ];
     }
 }

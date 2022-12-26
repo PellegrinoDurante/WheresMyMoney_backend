@@ -43,7 +43,7 @@ class TransactionResource extends Resource
                 Forms\Components\Textarea::make('metadata')
                     ->label(__('transactions.metadata'))
                     ->disabled()
-                    ->required()
+                    ->dehydrated(false)
                     ->afterStateHydrated(function (Forms\Components\Textarea $component, $state) {
                         $component->state(json_encode($state));
                     }),
@@ -72,6 +72,7 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('wallet.name')
                     ->label(__('transactions.wallet'))
             ])
+            ->defaultSort('spent_at', 'desc')
             ->filters([
                 //
             ])
