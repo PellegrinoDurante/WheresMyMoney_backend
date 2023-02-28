@@ -51,6 +51,13 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+
+    dashboard:
+        image: metabase/metabase
+        ports:
+            - "3000:3000"
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
