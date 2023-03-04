@@ -54,6 +54,8 @@ services:
 
     dashboard:
         image: metabase/metabase
+        volumes:
+            - 'metabase-volume:/metabase.db'
         ports:
             - "3000:3000"
         networks:
@@ -63,4 +65,6 @@ networks:
         driver: bridge
 volumes:
     sail-mysql:
+        driver: local
+    metabase-volume:
         driver: local
