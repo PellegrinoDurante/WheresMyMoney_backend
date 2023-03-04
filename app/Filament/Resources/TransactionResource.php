@@ -50,6 +50,9 @@ class TransactionResource extends Resource
             ]);
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function table(Table $table): Table
     {
         return $table
@@ -67,7 +70,10 @@ class TransactionResource extends Resource
                         'success' => fn($state) => $state === __('transactions.type_income'),
                         'danger' => fn($state) => $state === __('transactions.type_outcome'),
                     ]),
-                Tables\Columns\BadgeColumn::make('category.name')
+                Tables\Columns\BadgeColumn::make('category')
+                    ->getStateUsing(function ($record): string {
+                        return $record->category?->name ?? ($record->guessedCategory?->name . '*');
+                    })
                     ->label(__('transactions.category')),
                 Tables\Columns\TextColumn::make('wallet.name')
                     ->label(__('transactions.wallet'))
@@ -77,7 +83,11 @@ class TransactionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateFormDataUsing(function (array $data) {
+                        $data['category'] = $data['category_id'] ?? $data['guessed_category_id'];
+                        return $data;
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

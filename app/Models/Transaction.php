@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\TransactionCreated;
+use App\Events\TransactionUpdating;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -40,6 +42,9 @@ use Illuminate\Support\Carbon;
  * @property int $category_id
  * @property-read TransactionCategory $category
  * @method static Builder|Transaction whereCategoryId($value)
+ * @property int|null $guessed_category_id
+ * @method static Builder|Transaction whereGuessedCategoryId($value)
+ * @property-read \App\Models\TransactionCategory|null $guessedCategory
  */
 class Transaction extends Model
 {
@@ -55,6 +60,11 @@ class Transaction extends Model
 
     protected $casts = [
         'metadata' => 'array',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => TransactionCreated::class,
+        'updating' => TransactionUpdating::class,
     ];
 
     protected function amount(): Attribute
@@ -73,5 +83,10 @@ class Transaction extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(TransactionCategory::class, 'category_id');
+    }
+
+    public function guessedCategory(): BelongsTo
+    {
+        return $this->belongsTo(TransactionCategory::class, 'guessed_category_id');
     }
 }

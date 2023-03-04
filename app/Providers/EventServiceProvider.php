@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\TransactionCreated;
+use App\Events\TransactionUpdating;
+use App\Listeners\GuessTransactionCategory;
+use App\Listeners\TrainTransactionCategorization;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -17,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        TransactionCreated::class => [
+            GuessTransactionCategory::class,
+        ],
+        TransactionUpdating::class => [
+            TrainTransactionCategorization::class,
         ],
     ];
 
