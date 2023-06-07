@@ -59,7 +59,8 @@ class TransactionResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('spent_at')
                     ->label(__('transactions.spent_at'))
-                    ->date(),
+                    ->date()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
                     ->label(__('transactions.amount'))
                     ->money('EUR', true),
@@ -84,8 +85,10 @@ class TransactionResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->mutateFormDataUsing(function (array $data) {
-                        $data['category'] = $data['category_id'] ?? $data['guessed_category_id'];
+                    ->mutateRecordDataUsing(function (array $data) {
+                        $data['guessed_category'] = $data['category_id'] == null;
+                        $data['category_id'] = $data['category_id'] ?? $data['guessed_category_id'];
+
                         return $data;
                     }),
                 Tables\Actions\DeleteAction::make(),

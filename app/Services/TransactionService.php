@@ -59,7 +59,9 @@ class TransactionService
 
         $sample = $transaction->metadata['remittanceInformation'];
         $label = $transaction->category_id;
+
         $dataset = new Labeled([$sample], [$label]);
+        $dataset->transformLabels(strval(...));
 
         $pipeline->partial($dataset);
 

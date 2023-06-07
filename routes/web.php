@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/redirect/{driver}', [AuthController::class, 'redirect'])
         ->name('auth.redirect');
     Route::get('auth/callback/{driver}', [AuthController::class, 'callback'])
