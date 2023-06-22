@@ -3,6 +3,7 @@
 namespace App\Services\BankService;
 
 use App\Models\AccessToken;
+use App\Services\TransactionService;
 use Closure;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Carbon;
@@ -18,10 +19,12 @@ class NordigenService extends BankServiceAbstract
     private string $clientId;
     private string $clientSecret;
 
-    public function __construct()
+    public function __construct(TransactionService $transactionService)
     {
         $this->clientId = config('services.nordigen.client_id');
         $this->clientSecret = config('services.nordigen.client_secret');
+
+        parent::__construct($transactionService);
     }
 
     public function getInstitutions(string $countryCode = 'IT'): Collection

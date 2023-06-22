@@ -2,27 +2,36 @@
 
 namespace App\Services\BankService;
 
+use Akaunting\Money\Money;
 use App\Models\AccessToken;
 use App\Models\Transaction;
+use App\Services\TransactionService;
 use Carbon\Carbon;
+use Log;
 
 abstract class BankServiceAbstract implements BankServiceInterface
 {
-    public function syncTransactions(AccessToken $accountAccessToken)
+    public function __construct(
+        private readonly TransactionService $transactionService,
+    )
     {
+    }
+
+    public function syncTransactions(AccessToken $accountAccessToken): array
+    {
+        Log::info("Start transactions sync");
+
+        $newTransactionsCount = 0;
+        $newPotentialDuplicates = 0;
+
         $bankTransactions = $this->getTransactions($accountAccessToken, $this->getMinDateAllowed($accountAccessToken), now());
-        \Log::info(var_export($bankTransactions, true));
-        $bankTransactions->each(function (array $data) use ($accountAccessToken) {
-            $transactionId = $data['internalTransactionId'] ?? $data['transactionId'] ?? null;
+        $bankTransactions->each(function (array $data) use (&$newTransactionsCount, &$newPotentialDuplicates, $accountAccessToken) {
+            $transactionId = $data['internalTransactionId'] ?? null;
             $merchantName = $data['creditorName'] ?? $data['debtorName'] ?? null;
             $remittanceInformation = $data['remittanceInformationUnstructured'] ?? null;
 
-            if (Transaction::where('metadata->transactionId', '=', $transactionId)->exists()) {
-                return;
-            }
-
-            Transaction::create([
-                'amount' => $data['transactionAmount']['amount'],
+            $transactionData = [
+                'amount' => Money::EUR($data['transactionAmount']['amount'], true),
                 'spent_at' => Carbon::parse($data['bookingDate']),
                 'wallet_id' => $accountAccessToken->wallet->id,
                 'metadata' => [
@@ -30,8 +39,40 @@ abstract class BankServiceAbstract implements BankServiceInterface
                     'merchantName' => $merchantName,
                     'remittanceInformation' => $remittanceInformation,
                 ],
-            ]);
+            ];
+
+            // Check transaction duplicates
+            $duplicatedTransaction = Transaction::where('metadata->transactionId', '=', $transactionId)
+                ->where('wallet_id', $accountAccessToken->wallet->id)
+                ->first();
+
+            if ($duplicatedTransaction != null) {
+                Log::info("A transaction with internal ID " . ($transactionId ?? 'NULL') . ' already exists - updating its data');
+                $duplicatedTransaction->update($transactionData);
+                return;
+            }
+
+            // Create new transaction
+            $transaction = Transaction::create($transactionData);
+            Log::info("Created transaction with internal ID " . $transactionId ?? 'NULL');
+            $newTransactionsCount++;
+
+            // Check if it's a potential duplicate
+            $hasPotentialDuplicates = $this->transactionService->getPotentialDuplicates($transaction)->isNotEmpty();
+
+            if ($hasPotentialDuplicates) {
+                $newPotentialDuplicates++;
+            } else {
+                $transaction->update(['duplication_checked' => true]);
+            }
         });
+
+        Log::info(sprintf('Transactions sync completed: %d transactions created and %d potential duplicated transactions detected', $newTransactionsCount, $newPotentialDuplicates));
+
+        return [
+            'created' => $newTransactionsCount,
+            'potentialDuplicates' => $newPotentialDuplicates,
+        ];
     }
 
     protected function isTokenExpired(AccessToken $nordigenAccessToken): bool
