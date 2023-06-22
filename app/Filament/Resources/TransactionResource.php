@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Akaunting\Money\Money;
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Models\Transaction;
 use Filament\Forms;
@@ -44,9 +45,7 @@ class TransactionResource extends Resource
                     ->label(__('transactions.metadata'))
                     ->disabled()
                     ->dehydrated(false)
-                    ->afterStateHydrated(function (Forms\Components\Textarea $component, $state) {
-                        $component->state(json_encode($state));
-                    }),
+                    ->afterStateHydrated(fn($component, $state) => $component->state(json_encode($state))),
             ]);
     }
 
@@ -62,11 +61,10 @@ class TransactionResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('transactions.amount'))
-                    ->money('EUR', true),
+                    ->label(__('transactions.amount')),
                 Tables\Columns\BadgeColumn::make('type')
                     ->label(__('transactions.type'))
-                    ->getStateUsing(fn(Transaction $record): string => $record->amount >= 0 ? 'Entrata' : 'Uscita')
+                    ->getStateUsing(fn(Transaction $record): string => $record->amount->greaterThanOrEqual(Money::EUR(0)) ? 'Entrata' : 'Uscita')
                     ->colors([
                         'success' => fn($state) => $state === __('transactions.type_income'),
                         'danger' => fn($state) => $state === __('transactions.type_outcome'),
@@ -88,7 +86,11 @@ class TransactionResource extends Resource
                     ->mutateRecordDataUsing(function (array $data) {
                         $data['guessed_category'] = $data['category_id'] == null;
                         $data['category_id'] = $data['category_id'] ?? $data['guessed_category_id'];
-
+                        $data['amount'] = $data['amount']['value'];
+                        return $data;
+                    })
+                    ->mutateFormDataUsing(function (array $data) {
+                        $data['amount'] = Money::EUR((float) $data['amount'], true);
                         return $data;
                     }),
                 Tables\Actions\DeleteAction::make(),

@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.1",
         "ext-imagick": "*",
+        "akaunting/laravel-money": "^3",
         "doctrine/dbal": "^3.4",
         "filament/filament": "^2.0",
         "flowframe/laravel-trend": "^0.1.1",

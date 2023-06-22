@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Akaunting\Money\Money;
+use App\Casts\MoneyCast;
 use App\Events\TransactionCreated;
 use App\Events\TransactionUpdating;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,7 +20,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property int $amount
+ * @property Money $amount
  * @property string $spent_at
  * @property array $metadata
  * @method static Builder|Transaction newModelQuery()
@@ -60,20 +61,13 @@ class Transaction extends Model
 
     protected $casts = [
         'metadata' => 'array',
+        'amount' => MoneyCast::class,
     ];
 
     protected $dispatchesEvents = [
         'created' => TransactionCreated::class,
         'updating' => TransactionUpdating::class,
     ];
-
-    protected function amount(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value) => $value / 100,
-            set: fn($value) => $value * 100
-        );
-    }
 
     public function wallet(): BelongsTo
     {
