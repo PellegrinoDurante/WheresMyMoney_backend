@@ -51,15 +51,12 @@ class Transaction extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'amount',
-        'spent_at',
-        'wallet_id',
-        'metadata',
-        'category_id',
+    protected $guarded = [
+        'id'
     ];
 
     protected $casts = [
+        'spent_at' => 'datetime',
         'metadata' => 'array',
         'amount' => MoneyCast::class,
     ];

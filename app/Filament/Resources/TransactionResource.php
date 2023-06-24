@@ -5,11 +5,13 @@ namespace App\Filament\Resources;
 use Akaunting\Money\Money;
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Models\Transaction;
+use Exception;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 
 class TransactionResource extends Resource
 {
@@ -50,7 +52,7 @@ class TransactionResource extends Resource
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public static function table(Table $table): Table
     {
@@ -59,7 +61,7 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('spent_at')
                     ->label(__('transactions.spent_at'))
                     ->date()
-                    ->sortable(),
+                    ->sortable(query: fn(Builder $query, string $direction) => $query->orderBy('spent_at', $direction)->orderBy('id', 'desc')),
                 Tables\Columns\TextColumn::make('amount')
                     ->label(__('transactions.amount')),
                 Tables\Columns\BadgeColumn::make('type')
@@ -90,7 +92,7 @@ class TransactionResource extends Resource
                         return $data;
                     })
                     ->mutateFormDataUsing(function (array $data) {
-                        $data['amount'] = Money::EUR((float) $data['amount'], true);
+                        $data['amount'] = Money::EUR((float)$data['amount'], true);
                         return $data;
                     }),
                 Tables\Actions\DeleteAction::make(),
