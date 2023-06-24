@@ -31,7 +31,7 @@ abstract class BankServiceAbstract implements BankServiceInterface
             $remittanceInformation = $data['remittanceInformationUnstructured'] ?? null;
 
             $transactionData = [
-                'amount' => Money::EUR($data['transactionAmount']['amount'], true),
+                'amount' => Money::EUR(floatval($data['transactionAmount']['amount']), true),
                 'spent_at' => Carbon::parse($data['bookingDate']),
                 'wallet_id' => $accountAccessToken->wallet->id,
                 'metadata' => [
