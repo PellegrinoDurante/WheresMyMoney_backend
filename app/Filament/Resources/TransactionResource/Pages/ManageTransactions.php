@@ -3,13 +3,13 @@
 namespace App\Filament\Resources\TransactionResource\Pages;
 
 use App\Filament\Resources\TransactionResource;
-use App\Filament\Resources\TransactionResource\Widgets\TransactionsChart;
 use App\Models\AccessToken;
 use App\Services\BankService\NordigenService;
 use Exception;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ManageRecords;
+use Filament\Tables\Filters\Layout;
 
 class ManageTransactions extends ManageRecords
 {
@@ -40,6 +40,11 @@ class ManageTransactions extends ManageRecords
             ]);
 
         return $actions;
+    }
+
+    protected function getTableFiltersLayout(): ?string
+    {
+        return Layout::AboveContent;
     }
 
     protected function getHeaderWidgets(): array

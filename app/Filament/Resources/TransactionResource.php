@@ -81,7 +81,11 @@ class TransactionResource extends Resource
             ])
             ->defaultSort('spent_at', 'desc')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category')
+                    ->label(__('transactions.category'))
+                    ->multiple()
+                    ->relationship('category', 'name')
+                    ->query(fn(Builder $query, array $data) => $query->inCategories($data['values'])),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
