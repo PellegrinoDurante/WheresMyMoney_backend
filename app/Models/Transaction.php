@@ -80,4 +80,26 @@ class Transaction extends Model
     {
         return $this->belongsTo(TransactionCategory::class, 'guessed_category_id');
     }
+
+    public function scopeNegative(Builder $query): void
+    {
+        $query->where('amount', '<', 0);
+    }
+
+    public function scopeInCategories(Builder $query, array $categories = []): void
+    {
+        $query->when(!empty($categories), function (Builder $query) use ($categories) {
+            $query->whereIn('category_id', $categories)
+                ->orWhere(fn(Builder $query) => $query->whereNull('category_id')->whereIn('guessed_category_id', $categories));
+        });
+    }
+
+    public function scopeNotInCategory(Builder $query, int $categoryId): void
+    {
+        $query->where(function (Builder $query) use ($categoryId) {
+            $query
+                ->where('category_id', '!=', $categoryId)
+                ->orWhere(fn(Builder $query) => $query->whereNull('category_id')->where('guessed_category_id', '!=', $categoryId));
+        });
+    }
 }

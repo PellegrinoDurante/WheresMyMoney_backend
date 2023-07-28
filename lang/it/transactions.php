@@ -13,4 +13,11 @@ return [
     'bank_account' => 'Conto bancario',
     'category' => 'Categoria',
     'metadata' => 'Metadata',
+
+    'stats' => [
+        'spent_per_categories_of_month' => 'Spese del mese per categoria',
+        'monthly_spent' => 'Spese mensili',
+        'spent_sum' => 'Somma spese',
+        'spent_average' => 'Media spese',
+    ]
 ];

@@ -45,7 +45,8 @@ class ManageTransactions extends ManageRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            TransactionsChart::class,
+            TransactionResource\Widgets\CategoriesChart::class,
+            TransactionResource\Widgets\TotalSpentChart::class,
         ];
     }
 }

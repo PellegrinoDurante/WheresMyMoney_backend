@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use Akaunting\Money\Money;
 use App\Models\Transaction;
 use App\Models\TransactionCategory;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Rubix\ML\Classifiers\GaussianNB;
 use Rubix\ML\Datasets\Labeled;
@@ -93,5 +96,41 @@ class TransactionService
             ->where('spent_at', $transaction->spent_at)
             ->where('metadata->remittanceInformation', $transaction->metadata['remittanceInformation'])
             ->get();
+    }
+
+    public function getMonthAverageSpent(CarbonInterface $relativeTo = null, int $periodInMonths = 12, array $categories = []): Money
+    {
+        $relativeTo = ($relativeTo ?? now())->toImmutable();
+
+        $total = Transaction::whereDate('spent_at', '>=', $relativeTo->subMonths($periodInMonths))
+            ->whereDate('spent_at', '<=', $relativeTo)
+            ->where('amount', '<', 0)
+            ->where(function (Builder $query) {
+                $query->where('category_id', '!=', 8)
+                    ->orWhere(fn (Builder $query) => $query->whereNull('category_id')->where('guessed_category_id', '!=', 8));
+            })
+            ->when(!empty($categories), function (Builder $query) use ($categories) {
+                $query->whereIn('category_id', $categories)
+                    ->orWhere(fn (Builder $query) => $query->whereNull('category_id')->whereIn('guessed_category_id', $categories));
+            })
+            ->sum('amount');
+
+        return Money::EUR(-$total)->divide($periodInMonths);
+    }
+
+    public function getAverageSpentOfLastYear(CarbonInterface $relativeTo = null): Collection
+    {
+        $relativeTo = ($relativeTo ?? now())->toImmutable();
+        $period = $relativeTo->subYear()->toPeriod($relativeTo, '1 month');
+
+        $stats = [];
+        foreach ($period as $date) {
+            $stats[] = [
+                'date' => $date->format('Y-m'),
+                'value' => $this->getMonthAverageSpent($date),
+            ];
+        }
+
+        return collect($stats);
     }
 }
