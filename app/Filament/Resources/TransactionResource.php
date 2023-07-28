@@ -34,7 +34,7 @@ class TransactionResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('amount')
                     ->label(__('transactions.amount'))
-                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(prefix: '€', isSigned: false))
+                    ->mask(fn(Forms\Components\TextInput\Mask $mask) => $mask->money(prefix: '€'))
                     ->required(),
                 Forms\Components\DateTimePicker::make('spent_at')
                     ->label(__('transactions.spent_at'))
